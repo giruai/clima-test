@@ -55,6 +55,7 @@ class WeatherViewModel @Inject constructor(
                             _uiState.value = WeatherUiState.Success(
                                 currentWeather = currentWeather,
                                 forecast = forecast,
+                                cityName = formatCityName(location.latitude, location.longitude),
                                 lastUpdated = System.currentTimeMillis()
                             )
                         }.onFailure { error ->
@@ -89,5 +90,11 @@ class WeatherViewModel @Inject constructor(
     fun refresh() {
         Timber.d("Refreshing weather data")
         loadWeather()
+    }
+
+    private fun formatCityName(latitude: Double, longitude: Double): String {
+        // TODO: Implement reverse geocoding for proper city name
+        // For now, show coordinates or "Current Location"
+        return String.format("%.2f°, %.2f°", latitude, longitude)
     }
 }

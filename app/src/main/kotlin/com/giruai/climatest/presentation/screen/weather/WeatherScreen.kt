@@ -68,6 +68,7 @@ fun WeatherScreen(
                 WeatherContent(
                     currentWeather = state.currentWeather,
                     forecast = state.forecast,
+                    cityName = state.cityName,
                     lastUpdated = state.lastUpdated,
                     onNavigateToSearch = onNavigateToSearch,
                     onNavigateToFavorites = onNavigateToFavorites,
@@ -102,6 +103,7 @@ fun WeatherScreen(
 private fun WeatherContent(
     currentWeather: CurrentWeather,
     forecast: List<DailyForecast>,
+    cityName: String,
     lastUpdated: Long,
     onNavigateToSearch: () -> Unit,
     onNavigateToFavorites: () -> Unit,
@@ -116,6 +118,7 @@ private fun WeatherContent(
         item {
             CurrentWeatherSection(
                 currentWeather = currentWeather,
+                cityName = cityName,
                 lastUpdated = lastUpdated
             )
         }
@@ -166,6 +169,7 @@ private fun WeatherContent(
 @Composable
 private fun CurrentWeatherSection(
     currentWeather: CurrentWeather,
+    cityName: String,
     lastUpdated: Long
 ) {
     Card(
@@ -179,6 +183,15 @@ private fun CurrentWeatherSection(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
+            // City Name
+            if (cityName.isNotEmpty()) {
+                Text(
+                    text = cityName,
+                    style = MaterialTheme.typography.titleLarge,
+                    color = MaterialTheme.colorScheme.primary
+                )
+            }
+
             // Weather Icon
             WeatherIcon(
                 condition = currentWeather.weatherCondition,

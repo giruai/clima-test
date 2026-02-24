@@ -30,10 +30,9 @@ class FusedLocationProviderImpl @Inject constructor(
             return Result.failure(SecurityException("Location permission not granted"))
         }
 
+        val cancellationToken = CancellationTokenSource()
         return try {
             withTimeout(LOCATION_TIMEOUT_MS) {
-                val cancellationToken = CancellationTokenSource()
-                
                 @Suppress("MissingPermission")
                 val androidLocation = fusedClient.getCurrentLocation(
                     Priority.PRIORITY_BALANCED_POWER_ACCURACY,
@@ -59,6 +58,8 @@ class FusedLocationProviderImpl @Inject constructor(
         } catch (e: Exception) {
             Timber.e(e, "Failed to get location")
             Result.failure(e)
+        } finally {
+            cancellationToken.cancel()
         }
     }
 
@@ -95,6 +96,6 @@ class FusedLocationProviderImpl @Inject constructor(
     }
 
     companion object {
-        private const val LOCATION_TIMEOUT_MS = 10_000L
+        private const val LOCATION_TIMEOUT_MS = 30_000L
     }
 }
