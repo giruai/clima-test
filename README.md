@@ -70,15 +70,20 @@ adb install -r app/build/outputs/apk/debug/app-debug.apk
 
 ## 📊 Project Status
 
-**Current Phase:** Development (Sprint 1)
+**Current Phase:** Development (Sprint 2)
 
 ### Sprint Progress
-- **Sprint 1 — Foundation** (13/29 pts) 🟢 In Progress
+- **Sprint 1 — Foundation** (29/29 pts) ✅ **COMPLETE**
   - ✅ S1.1: Initialize Android Project
   - ✅ S1.2: Setup Hilt DI
   - ✅ S1.3: Setup Base Architecture
-  - 🔄 S2.1: Implement Location Provider
-  - 🔄 S2.2: Integrate Open-Meteo API
+  - ✅ S2.1: Implement Location Provider
+  - ✅ S2.2: Integrate Open-Meteo API
+  
+- **Sprint 2 — Weather Display** (13/26 pts) 🟢 In Progress
+  - ✅ S2.3: Build Weather Screen UI
+  - 🔄 S3.1: Implement City Search API
+  - ⏳ S3.2: Build Search Screen UI
 
 ### Milestones
 - [Sprint 1 — Foundation](https://github.com/giruai/clima-test/milestone/1) (29 pts)
