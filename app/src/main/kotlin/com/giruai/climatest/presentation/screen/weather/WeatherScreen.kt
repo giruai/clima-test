@@ -1,27 +1,357 @@
 package com.giruai.climatest.presentation.screen.weather
 
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.pullrefresh.PullRefreshIndicator
+import androidx.compose.material.pullrefresh.pullRefresh
+import androidx.compose.material.pullrefresh.rememberPullRefreshState
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import com.giruai.climatest.domain.model.CurrentWeather
+import com.giruai.climatest.domain.model.DailyForecast
+import com.giruai.climatest.presentation.components.ErrorMessage
+import com.giruai.climatest.presentation.components.LoadingIndicator
+import com.giruai.climatest.presentation.components.WeatherIcon
+import com.giruai.climatest.presentation.util.rememberLocationPermissionHandler
+import java.text.SimpleDateFormat
+import java.util.*
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun WeatherScreen(
     onNavigateToSearch: () -> Unit,
     onNavigateToFavorites: () -> Unit,
+    onNavigateToSettings: () -> Unit,
+    viewModel: WeatherViewModel = hiltViewModel()
+) {
+    val uiState by viewModel.uiState.collectAsState()
+
+    val permissionHandler = rememberLocationPermissionHandler { granted ->
+        if (granted) {
+            viewModel.loadWeather()
+        }
+    }
+
+    // Handle permission required state
+    LaunchedEffect(uiState) {
+        if (uiState is WeatherUiState.PermissionRequired) {
+            if (!permissionHandler.hasPermission()) {
+                permissionHandler.requestPermission()
+            }
+        }
+    }
+
+    val isRefreshing = uiState is WeatherUiState.Loading
+    val pullRefreshState = rememberPullRefreshState(
+        refreshing = isRefreshing,
+        onRefresh = { viewModel.refresh() }
+    )
+
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .pullRefresh(pullRefreshState)
+    ) {
+        when (val state = uiState) {
+            is WeatherUiState.Loading -> {
+                LoadingIndicator()
+            }
+
+            is WeatherUiState.Success -> {
+                WeatherContent(
+                    currentWeather = state.currentWeather,
+                    forecast = state.forecast,
+                    lastUpdated = state.lastUpdated,
+                    onNavigateToSearch = onNavigateToSearch,
+                    onNavigateToFavorites = onNavigateToFavorites,
+                    onNavigateToSettings = onNavigateToSettings
+                )
+            }
+
+            is WeatherUiState.Error -> {
+                ErrorMessage(
+                    message = state.message,
+                    onRetry = { viewModel.refresh() }
+                )
+            }
+
+            is WeatherUiState.PermissionRequired -> {
+                PermissionRequiredContent(
+                    onRequestPermission = { permissionHandler.requestPermission() },
+                    onNavigateToSearch = onNavigateToSearch
+                )
+            }
+        }
+
+        PullRefreshIndicator(
+            refreshing = isRefreshing,
+            state = pullRefreshState,
+            modifier = Modifier.align(Alignment.TopCenter)
+        )
+    }
+}
+
+@Composable
+private fun WeatherContent(
+    currentWeather: CurrentWeather,
+    forecast: List<DailyForecast>,
+    lastUpdated: Long,
+    onNavigateToSearch: () -> Unit,
+    onNavigateToFavorites: () -> Unit,
     onNavigateToSettings: () -> Unit
 ) {
-    // Placeholder - will be implemented in S2.3
+    LazyColumn(
+        modifier = Modifier.fillMaxSize(),
+        contentPadding = PaddingValues(16.dp),
+        verticalArrangement = Arrangement.spacedBy(24.dp)
+    ) {
+        // Current Weather Section
+        item {
+            CurrentWeatherSection(
+                currentWeather = currentWeather,
+                lastUpdated = lastUpdated
+            )
+        }
+
+        // 5-Day Forecast Header
+        item {
+            Text(
+                text = "5-Day Forecast",
+                style = MaterialTheme.typography.titleLarge,
+                color = MaterialTheme.colorScheme.primary
+            )
+        }
+
+        // Forecast Items
+        items(forecast) { day ->
+            ForecastItem(day)
+        }
+
+        // Navigation Buttons (Temporary - will be replaced by proper nav)
+        item {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                Button(
+                    onClick = onNavigateToSearch,
+                    modifier = Modifier.weight(1f)
+                ) {
+                    Text("Search")
+                }
+                Button(
+                    onClick = onNavigateToFavorites,
+                    modifier = Modifier.weight(1f)
+                ) {
+                    Text("Favorites")
+                }
+                Button(
+                    onClick = onNavigateToSettings,
+                    modifier = Modifier.weight(1f)
+                ) {
+                    Text("Settings")
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun CurrentWeatherSection(
+    currentWeather: CurrentWeather,
+    lastUpdated: Long
+) {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(24.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            // Weather Icon
+            WeatherIcon(
+                condition = currentWeather.weatherCondition,
+                large = true
+            )
+
+            // Temperature (large)
+            Text(
+                text = "${currentWeather.temperature.toInt()}°C",
+                style = MaterialTheme.typography.displayLarge,
+                color = MaterialTheme.colorScheme.primary
+            )
+
+            // Weather Description
+            Text(
+                text = currentWeather.weatherCondition.description,
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+
+            Divider()
+
+            // Weather Details
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceEvenly
+            ) {
+                WeatherDetail(
+                    label = "Feels Like",
+                    value = "${currentWeather.apparentTemperature.toInt()}°C"
+                )
+                WeatherDetail(
+                    label = "Wind",
+                    value = "${currentWeather.windSpeed.toInt()} km/h"
+                )
+                WeatherDetail(
+                    label = "Humidity",
+                    value = "${currentWeather.humidity}%"
+                )
+            }
+
+            // Last Updated
+            Text(
+                text = "Updated ${formatLastUpdated(lastUpdated)}",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
+    }
+}
+
+@Composable
+private fun WeatherDetail(label: String, value: String) {
+    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+        Text(
+            text = value,
+            style = MaterialTheme.typography.titleMedium
+        )
+        Text(
+            text = label,
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+    }
+}
+
+@Composable
+private fun ForecastItem(day: DailyForecast) {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            // Day Name
+            Text(
+                text = formatDayName(day.date),
+                style = MaterialTheme.typography.titleMedium,
+                modifier = Modifier.weight(1f)
+            )
+
+            // Weather Icon
+            WeatherIcon(
+                condition = day.weatherCondition,
+                large = false
+            )
+
+            // Max/Min Temps
+            Column(
+                horizontalAlignment = Alignment.End,
+                modifier = Modifier.weight(1f)
+            ) {
+                Text(
+                    text = "${day.temperatureMax.toInt()}°C",
+                    style = MaterialTheme.typography.titleMedium
+                )
+                Text(
+                    text = "${day.temperatureMin.toInt()}°C",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun PermissionRequiredContent(
+    onRequestPermission: () -> Unit,
+    onNavigateToSearch: () -> Unit
+) {
     Box(
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
     ) {
-        Text(
-            text = "Weather Screen",
-            style = MaterialTheme.typography.headlineLarge
-        )
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(16.dp),
+            modifier = Modifier.padding(32.dp)
+        ) {
+            Text(
+                text = "📍",
+                style = MaterialTheme.typography.displayLarge
+            )
+            Text(
+                text = "Location Permission Required",
+                style = MaterialTheme.typography.titleLarge,
+                textAlign = TextAlign.Center
+            )
+            Text(
+                text = "ClimaApp needs your location to show weather for your area.",
+                style = MaterialTheme.typography.bodyLarge,
+                textAlign = TextAlign.Center,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+            Button(onClick = onRequestPermission) {
+                Text("Enable Location")
+            }
+            TextButton(onClick = onNavigateToSearch) {
+                Text("Search for a city instead")
+            }
+        }
+    }
+}
+
+private fun formatDayName(date: String): String {
+    return try {
+        val sdf = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+        val parsedDate = sdf.parse(date) ?: return date
+        val calendar = Calendar.getInstance().apply { time = parsedDate }
+        val today = Calendar.getInstance()
+        
+        when {
+            calendar.get(Calendar.DAY_OF_YEAR) == today.get(Calendar.DAY_OF_YEAR) -> "Today"
+            calendar.get(Calendar.DAY_OF_YEAR) == today.get(Calendar.DAY_OF_YEAR) + 1 -> "Tomorrow"
+            else -> SimpleDateFormat("EEE, MMM d", Locale.getDefault()).format(parsedDate)
+        }
+    } catch (e: Exception) {
+        date
+    }
+}
+
+private fun formatLastUpdated(timestamp: Long): String {
+    val now = System.currentTimeMillis()
+    val diff = now - timestamp
+    return when {
+        diff < 60_000 -> "just now"
+        diff < 3600_000 -> "${diff / 60_000} min ago"
+        else -> SimpleDateFormat("HH:mm", Locale.getDefault()).format(Date(timestamp))
     }
 }
