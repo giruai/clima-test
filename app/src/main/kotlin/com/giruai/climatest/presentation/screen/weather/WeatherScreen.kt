@@ -5,6 +5,9 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.outlined.Star
 import androidx.compose.material.pullrefresh.PullRefreshIndicator
@@ -81,19 +84,19 @@ fun WeatherScreen(
         bottomBar = {
             NavigationBar {
                 NavigationBarItem(
-                    icon = { Text("🔍", style = MaterialTheme.typography.titleMedium) },
+                    icon = { Icon(Icons.Filled.Search, contentDescription = "Search") },
                     label = { Text("Search") },
                     selected = false,
                     onClick = onNavigateToSearch
                 )
                 NavigationBarItem(
-                    icon = { Text("⭐", style = MaterialTheme.typography.titleMedium) },
+                    icon = { Icon(Icons.Filled.Favorite, contentDescription = "Favorites") },
                     label = { Text("Favorites") },
                     selected = false,
                     onClick = onNavigateToFavorites
                 )
                 NavigationBarItem(
-                    icon = { Text("⚙️", style = MaterialTheme.typography.titleMedium) },
+                    icon = { Icon(Icons.Filled.Settings, contentDescription = "Settings") },
                     label = { Text("Settings") },
                     selected = false,
                     onClick = onNavigateToSettings
