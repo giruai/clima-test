@@ -2,8 +2,8 @@ package com.giruai.climatest.di
 
 import android.content.Context
 import androidx.room.Room
+import com.giruai.climatest.data.local.dao.FavoriteCityDao
 import com.giruai.climatest.data.local.database.ClimaDatabase
-import com.giruai.climatest.data.local.database.FavoriteCityDao
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -17,14 +17,21 @@ object DatabaseModule {
 
     @Provides
     @Singleton
-    fun provideDatabase(@ApplicationContext context: Context): ClimaDatabase =
-        Room.databaseBuilder(
+    fun provideClimaDatabase(
+        @ApplicationContext context: Context
+    ): ClimaDatabase {
+        return Room.databaseBuilder(
             context,
             ClimaDatabase::class.java,
-            "clima_db"
-        ).build()
+            "clima_database"
+        )
+            .fallbackToDestructiveMigration() // For v1, simple strategy
+            .build()
+    }
 
     @Provides
-    fun provideFavoriteCityDao(database: ClimaDatabase): FavoriteCityDao =
-        database.favoriteCityDao()
+    @Singleton
+    fun provideFavoriteCityDao(database: ClimaDatabase): FavoriteCityDao {
+        return database.favoriteCityDao()
+    }
 }
