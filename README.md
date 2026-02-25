@@ -17,14 +17,14 @@ Android weather app with city search, 5-day forecast, favorites, and geolocation
 
 <table>
   <tr>
-    <td><img src="screenshots/01-weather-with-fab.png" width="200"/><br/><b>Weather Screen</b></td>
-    <td><img src="screenshots/02-favorite-added.png" width="200"/><br/><b>Add to Favorites</b></td>
-    <td><img src="screenshots/03-favorites-list.png" width="200"/><br/><b>Favorites List</b></td>
+    <td><img src="screenshots/01-weather.png" width="200"/><br/><b>Weather Screen</b></td>
+    <td><img src="screenshots/02-settings.png" width="200"/><br/><b>Settings</b></td>
+    <td><img src="screenshots/03-favorites.png" width="200"/><br/><b>Favorites</b></td>
   </tr>
   <tr>
-    <td><img src="screenshots/04-delete-confirmation.png" width="200"/><br/><b>Delete Confirmation</b></td>
-    <td><img src="screenshots/05-empty-state.png" width="200"/><br/><b>Empty State</b></td>
-    <td><img src="screenshots/06-search-screen.png" width="200"/><br/><b>City Search</b></td>
+    <td><img src="screenshots/04-search.png" width="200"/><br/><b>City Search</b></td>
+    <td></td>
+    <td></td>
   </tr>
 </table>
 
@@ -89,7 +89,7 @@ adb install -r app/build/outputs/apk/debug/app-debug.apk
 
 **Current Phase:** Development (Sprint 4 — Settings & Polish)
 
-**Progress:** 78/117 pts (67% of MVP) | **Velocity:** ~10 pts/hour
+**Progress:** 89/117 pts (76% of MVP) | **Velocity:** ~10 pts/hour
 
 ### Sprint Progress
 - **Sprint 1 — Foundation** (29/29 pts) ✅ **COMPLETE**
@@ -110,25 +110,27 @@ adb install -r app/build/outputs/apk/debug/app-debug.apk
   - ✅ S4.3: Build Favorites Screen UI (list, delete confirmation, empty state)
   - ✅ S4.4: Add to Favorites Button (FAB with snackbar confirmation)
 
-- **Sprint 4 — Settings & Polish** (0/21 pts) 🔄 **NEXT**
-  - ⏳ S5.1: Build Settings Screen (units, theme, about)
-  - ⏳ S5.2: Implement Unit Conversions
-  - ⏳ S5.3: Error Handling Polish
-  - ⏳ S5.4: Reverse Geocoding for City Names
+- **Sprint 4 — Settings & Polish** (12/21 pts) 🔄 **IN PROGRESS**
+  - ✅ S5.1: Settings Manager (SharedPreferences repository + 7 tests)
+  - ✅ S5.2: Settings Screen UI + Bottom Navigation
+  - ✅ S5.3: Unit Conversions (°C/°F, km/h/mph + 10 tests)
+  - ⏳ S6.1: Material 3 Theme (5 pts)
+  - ⏳ S6.2: Loading & Error States Polish (5 pts)
+  - ⏳ Reverse Geocoding for City Names (Issue #25, 6 pts)
 
 ### Milestones
 - ✅ [Sprint 1 — Foundation](https://github.com/giruai/clima-test/milestone/1) (29 pts) — CLOSED
 - ✅ [Sprint 2 — Weather Display](https://github.com/giruai/clima-test/milestone/2) (26 pts) — CLOSED
 - ✅ [Sprint 3 — Favorites](https://github.com/giruai/clima-test/milestone/3) (23 pts) — CLOSED
-- 🔄 [Sprint 4 — Settings & Polish](https://github.com/giruai/clima-test/milestone/4) (21 pts)
+- 🔄 [Sprint 4 — Settings & Polish](https://github.com/giruai/clima-test/milestone/4) (21 pts) — IN PROGRESS
 - [Sprint 5 — Launch](https://github.com/giruai/clima-test/milestone/5) (18 pts)
 
 [View all issues →](https://github.com/giruai/clima-test/issues)
 
 ### Recent Activity
+- **2026-02-26**: Settings implementation — Unit conversions (°C/°F, km/h/mph) + bottom navigation (PR #31, #32, #33)
 - **2026-02-25**: Sprint 3 complete — Favorites flow (database, UI, add/delete) with end-to-end device testing (PR #30)
 - **2026-02-25**: Sprint 2 complete — Search Screen UI with autocomplete, recent searches, navigation (PR #27)
-- **2026-02-24**: Sprint 1 complete — Weather Screen UI with location & API integration (PR #24)
 
 ## 🧪 Testing
 
@@ -155,4 +157,4 @@ Product Owner: Franco (@noscr33n)
 
 ---
 
-**Last updated:** 2026-02-25
+**Last updated:** 2026-02-26
