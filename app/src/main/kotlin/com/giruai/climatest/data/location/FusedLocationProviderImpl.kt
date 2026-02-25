@@ -53,8 +53,8 @@ class FusedLocationProviderImpl @Inject constructor(
                 }
             }
         } catch (e: TimeoutCancellationException) {
-            Timber.e(e, "Location timeout after ${LOCATION_TIMEOUT_MS}ms")
-            Result.failure(Exception("Location request timed out after ${LOCATION_TIMEOUT_MS / 1000}s"))
+            Timber.w("Location timeout after ${LOCATION_TIMEOUT_MS}ms, trying last known location")
+            getLastKnownLocationOrFallback()
         } catch (e: Exception) {
             Timber.e(e, "Failed to get location")
             Result.failure(e)
@@ -84,6 +84,16 @@ class FusedLocationProviderImpl @Inject constructor(
         }
     }
 
+    @Suppress("MissingPermission")
+    private suspend fun getLastKnownLocationOrFallback(): Result<Location> {
+        val lastKnown = getLastKnownLocation()
+        if (lastKnown.isSuccess) return lastKnown
+
+        // Fallback to Buenos Aires when all location methods fail
+        Timber.w("All location methods failed, using fallback: Buenos Aires")
+        return Result.success(FALLBACK_LOCATION)
+    }
+
     override fun hasPermission(): Boolean {
         return ContextCompat.checkSelfPermission(
             context,
@@ -97,5 +107,11 @@ class FusedLocationProviderImpl @Inject constructor(
 
     companion object {
         private const val LOCATION_TIMEOUT_MS = 30_000L
+
+        // Buenos Aires fallback when GPS and lastLocation both fail
+        private val FALLBACK_LOCATION = Location(
+            latitude = -34.6037,
+            longitude = -58.3816
+        )
     }
 }

@@ -49,8 +49,15 @@ fun ClimaNavGraph(
                     defaultValue = null
                 }
             )
-        ) {
+        ) { backStackEntry ->
+            val latString = backStackEntry.arguments?.getString("lat")
+            val lonString = backStackEntry.arguments?.getString("lon")
+            val latitude = latString?.toDoubleOrNull()
+            val longitude = lonString?.toDoubleOrNull()
+
             WeatherScreen(
+                initialLatitude = latitude,
+                initialLongitude = longitude,
                 onNavigateToSearch = { navController.navigate(Routes.SEARCH) },
                 onNavigateToFavorites = { navController.navigate(Routes.FAVORITES) },
                 onNavigateToSettings = { navController.navigate(Routes.SETTINGS) }

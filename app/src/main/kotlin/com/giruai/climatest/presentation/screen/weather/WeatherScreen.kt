@@ -26,11 +26,19 @@ import java.util.*
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun WeatherScreen(
+    initialLatitude: Double? = null,
+    initialLongitude: Double? = null,
     onNavigateToSearch: () -> Unit,
     onNavigateToFavorites: () -> Unit,
     onNavigateToSettings: () -> Unit,
     viewModel: WeatherViewModel = hiltViewModel()
 ) {
+    // Pass initial coords to ViewModel if provided
+    LaunchedEffect(initialLatitude, initialLongitude) {
+        if (initialLatitude != null && initialLongitude != null) {
+            viewModel.loadWeatherForCoordinates(initialLatitude, initialLongitude)
+        }
+    }
     val uiState by viewModel.uiState.collectAsState()
 
     val permissionHandler = rememberLocationPermissionHandler { granted ->
