@@ -3,8 +3,11 @@ package com.giruai.climatest.presentation.screen.weather
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.giruai.climatest.domain.location.LocationProvider
+import com.giruai.climatest.domain.model.City
+import com.giruai.climatest.domain.usecase.AddFavoriteUseCase
 import com.giruai.climatest.domain.usecase.GetCurrentWeatherUseCase
 import com.giruai.climatest.domain.usecase.GetForecastUseCase
+import com.giruai.climatest.domain.usecase.IsFavoriteUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -17,11 +20,21 @@ import javax.inject.Inject
 class WeatherViewModel @Inject constructor(
     private val locationProvider: LocationProvider,
     private val getCurrentWeather: GetCurrentWeatherUseCase,
-    private val getForecast: GetForecastUseCase
+    private val getForecast: GetForecastUseCase,
+    private val addFavorite: AddFavoriteUseCase,
+    private val isFavoriteUseCase: IsFavoriteUseCase
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow<WeatherUiState>(WeatherUiState.Loading)
     val uiState: StateFlow<WeatherUiState> = _uiState.asStateFlow()
+
+    private val _isFavorite = MutableStateFlow(false)
+    val isFavorite: StateFlow<Boolean> = _isFavorite.asStateFlow()
+
+    private val _snackbarMessage = MutableStateFlow<String?>(null)
+    val snackbarMessage: StateFlow<String?> = _snackbarMessage.asStateFlow()
+
+    private var currentCity: City? = null
 
     init {
         checkPermissionAndLoadWeather()
@@ -73,12 +86,23 @@ class WeatherViewModel @Inject constructor(
                     // Fetch forecast
                     val forecastResult = getForecast(latitude, longitude)
                     forecastResult.onSuccess { forecast ->
+                        val cityName = formatCityName(latitude, longitude)
                         _uiState.value = WeatherUiState.Success(
                             currentWeather = currentWeather,
                             forecast = forecast,
-                            cityName = formatCityName(latitude, longitude),
+                            cityName = cityName,
                             lastUpdated = System.currentTimeMillis()
                         )
+                        
+                        // Store current city for favorites
+                        currentCity = City(
+                            id = generateCityId(latitude, longitude),
+                            name = cityName,
+                            country = "Unknown", // Will be improved with reverse geocoding
+                            latitude = latitude,
+                            longitude = longitude
+                        )
+                        checkIfFavorite()
                     }.onFailure { error ->
                         Timber.e(error, "Failed to fetch forecast")
                         _uiState.value = WeatherUiState.Error(
@@ -110,5 +134,47 @@ class WeatherViewModel @Inject constructor(
         // TODO: Implement reverse geocoding for proper city name
         // For now, show coordinates or "Current Location"
         return String.format("%.2f°, %.2f°", latitude, longitude)
+    }
+
+    private fun checkIfFavorite() {
+        viewModelScope.launch {
+            val city = currentCity ?: return@launch
+            _isFavorite.value = isFavoriteUseCase(city.id)
+        }
+    }
+
+    fun addToFavorites() {
+        val city = currentCity
+        if (city == null) {
+            _snackbarMessage.value = "No city loaded"
+            return
+        }
+
+        viewModelScope.launch {
+            val result = addFavorite(city)
+            result.onSuccess {
+                Timber.d("Added to favorites: ${city.name}")
+                _snackbarMessage.value = "Added to Favorites"
+                _isFavorite.value = true
+            }.onFailure { error ->
+                Timber.e(error, "Failed to add favorite: ${city.name}")
+                val message = when {
+                    error.message?.contains("10") == true -> "Maximum 10 favorites reached"
+                    else -> "Failed to add favorite"
+                }
+                _snackbarMessage.value = message
+            }
+        }
+    }
+
+    fun snackbarShown() {
+        _snackbarMessage.value = null
+    }
+
+    private fun generateCityId(latitude: Double, longitude: Double): Long {
+        // Simple hash of coordinates to generate stable ID
+        val latInt = (latitude * 100000).toLong()
+        val lonInt = (longitude * 100000).toLong()
+        return (latInt shl 32) or (lonInt and 0xFFFFFFFFL)
     }
 }

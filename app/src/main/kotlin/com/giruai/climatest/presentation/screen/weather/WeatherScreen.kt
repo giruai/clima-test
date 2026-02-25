@@ -4,6 +4,9 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.outlined.Star
 import androidx.compose.material.pullrefresh.PullRefreshIndicator
 import androidx.compose.material.pullrefresh.pullRefresh
 import androidx.compose.material.pullrefresh.rememberPullRefreshState
@@ -40,6 +43,18 @@ fun WeatherScreen(
         }
     }
     val uiState by viewModel.uiState.collectAsState()
+    val isFavorite by viewModel.isFavorite.collectAsState()
+    val snackbarMessage by viewModel.snackbarMessage.collectAsState()
+    
+    val snackbarHostState = remember { SnackbarHostState() }
+
+    // Show snackbar when message changes
+    LaunchedEffect(snackbarMessage) {
+        snackbarMessage?.let { message ->
+            snackbarHostState.showSnackbar(message)
+            viewModel.snackbarShown()
+        }
+    }
 
     val permissionHandler = rememberLocationPermissionHandler { granted ->
         if (granted) {
@@ -103,6 +118,33 @@ fun WeatherScreen(
             refreshing = isRefreshing,
             state = pullRefreshState,
             modifier = Modifier.align(Alignment.TopCenter)
+        )
+
+        // Add to Favorites FAB (only show when weather loaded)
+        if (uiState is WeatherUiState.Success) {
+            FloatingActionButton(
+                onClick = { viewModel.addToFavorites() },
+                modifier = Modifier
+                    .align(Alignment.BottomEnd)
+                    .padding(16.dp),
+                containerColor = if (isFavorite) 
+                    MaterialTheme.colorScheme.primaryContainer 
+                else 
+                    MaterialTheme.colorScheme.primary
+            ) {
+                Icon(
+                    imageVector = if (isFavorite) Icons.Filled.Star else Icons.Outlined.Star,
+                    contentDescription = if (isFavorite) "Already in favorites" else "Add to favorites"
+                )
+            }
+        }
+
+        // Snackbar host at bottom
+        SnackbarHost(
+            hostState = snackbarHostState,
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .padding(bottom = 80.dp) // Above FAB
         )
     }
 }
