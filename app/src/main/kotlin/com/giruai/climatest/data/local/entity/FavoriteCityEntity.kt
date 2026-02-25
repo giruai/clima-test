@@ -11,5 +11,5 @@ data class FavoriteCityEntity(
     val country: String,
     val latitude: Double,
     val longitude: Double,
-    val addedAt: Long = System.currentTimeMillis()
+    val addedAt: Long  // Must be provided explicitly (Room doesn't support runtime defaults)
 )

@@ -80,7 +80,7 @@ class FavoriteCityDaoTest {
     @Test
     fun deleteFavorite_removesCity() = runTest {
         // Given
-        val city = FavoriteCityEntity(1, "Paris", "France", 48.8566, 2.3522)
+        val city = FavoriteCityEntity(1, "Paris", "France", 48.8566, 2.3522, System.currentTimeMillis())
         dao.insertFavorite(city)
 
         // When
@@ -94,8 +94,8 @@ class FavoriteCityDaoTest {
     @Test
     fun getFavoriteCount_returnsCorrectCount() = runTest {
         // Given
-        val paris = FavoriteCityEntity(1, "Paris", "France", 48.8566, 2.3522)
-        val london = FavoriteCityEntity(2, "London", "UK", 51.5074, -0.1278)
+        val paris = FavoriteCityEntity(1, "Paris", "France", 48.8566, 2.3522, System.currentTimeMillis())
+        val london = FavoriteCityEntity(2, "London", "UK", 51.5074, -0.1278, System.currentTimeMillis())
 
         // When
         dao.insertFavorite(paris)
@@ -109,7 +109,7 @@ class FavoriteCityDaoTest {
     @Test
     fun getFavoriteById_returnsCity() = runTest {
         // Given
-        val city = FavoriteCityEntity(1, "Paris", "France", 48.8566, 2.3522)
+        val city = FavoriteCityEntity(1, "Paris", "France", 48.8566, 2.3522, System.currentTimeMillis())
         dao.insertFavorite(city)
 
         // When
@@ -149,8 +149,8 @@ class FavoriteCityDaoTest {
     @Test
     fun deleteAll_removesAllCities() = runTest {
         // Given
-        dao.insertFavorite(FavoriteCityEntity(1, "Paris", "France", 48.8566, 2.3522))
-        dao.insertFavorite(FavoriteCityEntity(2, "London", "UK", 51.5074, -0.1278))
+        dao.insertFavorite(FavoriteCityEntity(1, "Paris", "France", 48.8566, 2.3522, System.currentTimeMillis()))
+        dao.insertFavorite(FavoriteCityEntity(2, "London", "UK", 51.5074, -0.1278, System.currentTimeMillis()))
 
         // When
         dao.deleteAll()
