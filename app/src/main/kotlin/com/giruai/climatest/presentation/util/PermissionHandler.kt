@@ -5,16 +5,16 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.provider.Settings
-import androidx.activity.ComponentActivity
-import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.content.ContextCompat
 import timber.log.Timber
 
 object PermissionUtils {
-    
+
     fun hasLocationPermission(context: Context): Boolean {
         return ContextCompat.checkSelfPermission(
             context,
@@ -36,33 +36,16 @@ object PermissionUtils {
 }
 
 class LocationPermissionHandler(
-    private val activity: ComponentActivity,
-    private val onPermissionResult: (Boolean) -> Unit
+    private val context: Context,
+    private val requestPermissionLauncher: () -> Unit
 ) {
-    private var permissionLauncher: ActivityResultLauncher<Array<String>>? = null
-
-    init {
-        permissionLauncher = activity.registerForActivityResult(
-            ActivityResultContracts.RequestMultiplePermissions()
-        ) { permissions ->
-            val granted = permissions.values.any { it }
-            Timber.d("Location permission result: $granted")
-            onPermissionResult(granted)
-        }
-    }
-
     fun requestPermission() {
         Timber.d("Requesting location permission")
-        permissionLauncher?.launch(
-            arrayOf(
-                Manifest.permission.ACCESS_FINE_LOCATION,
-                Manifest.permission.ACCESS_COARSE_LOCATION
-            )
-        )
+        requestPermissionLauncher()
     }
 
     fun hasPermission(): Boolean {
-        return PermissionUtils.hasLocationPermission(activity)
+        return PermissionUtils.hasLocationPermission(context)
     }
 }
 
@@ -70,6 +53,27 @@ class LocationPermissionHandler(
 fun rememberLocationPermissionHandler(
     onPermissionResult: (Boolean) -> Unit
 ): LocationPermissionHandler {
-    val context = LocalContext.current as ComponentActivity
-    return LocationPermissionHandler(context, onPermissionResult)
+    val context = LocalContext.current
+
+    val launcher = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestMultiplePermissions()
+    ) { permissions ->
+        val granted = permissions.values.any { it }
+        Timber.d("Location permission result: $granted")
+        onPermissionResult(granted)
+    }
+
+    return remember(launcher) {
+        LocationPermissionHandler(
+            context = context,
+            requestPermissionLauncher = {
+                launcher.launch(
+                    arrayOf(
+                        Manifest.permission.ACCESS_FINE_LOCATION,
+                        Manifest.permission.ACCESS_COARSE_LOCATION
+                    )
+                )
+            }
+        )
+    }
 }

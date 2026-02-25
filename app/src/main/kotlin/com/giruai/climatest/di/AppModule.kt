@@ -4,6 +4,7 @@ import android.content.Context
 import com.giruai.climatest.data.local.preferences.SettingsManager
 import com.giruai.climatest.data.location.FusedLocationProviderImpl
 import com.giruai.climatest.domain.location.LocationProvider
+import com.google.gson.Gson
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
@@ -24,6 +25,10 @@ object AppModule {
     @Singleton
     fun provideSettingsManager(@ApplicationContext context: Context): SettingsManager =
         SettingsManager(context)
+
+    @Provides
+    @Singleton
+    fun provideGson(): Gson = Gson()
 }
 
 @Module

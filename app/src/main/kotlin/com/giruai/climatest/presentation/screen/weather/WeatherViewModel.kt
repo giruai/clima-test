@@ -43,35 +43,7 @@ class WeatherViewModel @Inject constructor(
             try {
                 val locationResult = locationProvider.getCurrentLocation()
                 locationResult.onSuccess { location ->
-                    Timber.d("Got location: ${location.latitude}, ${location.longitude}")
-                    
-                    // Fetch current weather
-                    val weatherResult = getCurrentWeather(location.latitude, location.longitude)
-                    weatherResult.onSuccess { currentWeather ->
-                        
-                        // Fetch forecast
-                        val forecastResult = getForecast(location.latitude, location.longitude)
-                        forecastResult.onSuccess { forecast ->
-                            _uiState.value = WeatherUiState.Success(
-                                currentWeather = currentWeather,
-                                forecast = forecast,
-                                cityName = formatCityName(location.latitude, location.longitude),
-                                lastUpdated = System.currentTimeMillis()
-                            )
-                        }.onFailure { error ->
-                            Timber.e(error, "Failed to fetch forecast")
-                            _uiState.value = WeatherUiState.Error(
-                                "Failed to load forecast: ${error.message}"
-                            )
-                        }
-                        
-                    }.onFailure { error ->
-                        Timber.e(error, "Failed to fetch current weather")
-                        _uiState.value = WeatherUiState.Error(
-                            "Failed to load weather: ${error.message}"
-                        )
-                    }
-                    
+                    loadWeatherForCoordinates(location.latitude, location.longitude)
                 }.onFailure { error ->
                     Timber.e(error, "Failed to get location")
                     _uiState.value = WeatherUiState.Error(
@@ -80,6 +52,48 @@ class WeatherViewModel @Inject constructor(
                 }
             } catch (e: Exception) {
                 Timber.e(e, "Unexpected error loading weather")
+                _uiState.value = WeatherUiState.Error(
+                    "An unexpected error occurred: ${e.message}"
+                )
+            }
+        }
+    }
+
+    fun loadWeatherForCoordinates(latitude: Double, longitude: Double) {
+        viewModelScope.launch {
+            _uiState.value = WeatherUiState.Loading
+
+            try {
+                Timber.d("Loading weather for coordinates: $latitude, $longitude")
+                
+                // Fetch current weather
+                val weatherResult = getCurrentWeather(latitude, longitude)
+                weatherResult.onSuccess { currentWeather ->
+                    
+                    // Fetch forecast
+                    val forecastResult = getForecast(latitude, longitude)
+                    forecastResult.onSuccess { forecast ->
+                        _uiState.value = WeatherUiState.Success(
+                            currentWeather = currentWeather,
+                            forecast = forecast,
+                            cityName = formatCityName(latitude, longitude),
+                            lastUpdated = System.currentTimeMillis()
+                        )
+                    }.onFailure { error ->
+                        Timber.e(error, "Failed to fetch forecast")
+                        _uiState.value = WeatherUiState.Error(
+                            "Failed to load forecast: ${error.message}"
+                        )
+                    }
+                    
+                }.onFailure { error ->
+                    Timber.e(error, "Failed to fetch current weather")
+                    _uiState.value = WeatherUiState.Error(
+                        "Failed to load weather: ${error.message}"
+                    )
+                }
+            } catch (e: Exception) {
+                Timber.e(e, "Unexpected error loading weather for coordinates")
                 _uiState.value = WeatherUiState.Error(
                     "An unexpected error occurred: ${e.message}"
                 )
