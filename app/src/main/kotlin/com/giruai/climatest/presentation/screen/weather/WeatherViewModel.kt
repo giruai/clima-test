@@ -2,6 +2,8 @@ package com.giruai.climatest.presentation.screen.weather
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.giruai.climatest.data.local.preferences.SettingsManager
+import com.giruai.climatest.data.local.preferences.UserSettings
 import com.giruai.climatest.domain.location.LocationProvider
 import com.giruai.climatest.domain.model.City
 import com.giruai.climatest.domain.usecase.AddFavoriteUseCase
@@ -10,8 +12,10 @@ import com.giruai.climatest.domain.usecase.GetForecastUseCase
 import com.giruai.climatest.domain.usecase.IsFavoriteUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
@@ -22,8 +26,16 @@ class WeatherViewModel @Inject constructor(
     private val getCurrentWeather: GetCurrentWeatherUseCase,
     private val getForecast: GetForecastUseCase,
     private val addFavorite: AddFavoriteUseCase,
-    private val isFavoriteUseCase: IsFavoriteUseCase
+    private val isFavoriteUseCase: IsFavoriteUseCase,
+    settingsManager: SettingsManager
 ) : ViewModel() {
+
+    val userSettings: StateFlow<UserSettings> = settingsManager.settings
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = UserSettings()
+        )
 
     private val _uiState = MutableStateFlow<WeatherUiState>(WeatherUiState.Loading)
     val uiState: StateFlow<WeatherUiState> = _uiState.asStateFlow()

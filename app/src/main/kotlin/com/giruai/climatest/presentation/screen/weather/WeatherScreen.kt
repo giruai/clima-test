@@ -20,11 +20,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.giruai.climatest.data.local.preferences.UserSettings
 import com.giruai.climatest.domain.model.CurrentWeather
 import com.giruai.climatest.domain.model.DailyForecast
 import com.giruai.climatest.presentation.components.ErrorMessage
 import com.giruai.climatest.presentation.components.LoadingIndicator
 import com.giruai.climatest.presentation.components.WeatherIcon
+import com.giruai.climatest.presentation.util.UnitConverter
 import com.giruai.climatest.presentation.util.rememberLocationPermissionHandler
 import java.text.SimpleDateFormat
 import java.util.*
@@ -48,6 +50,7 @@ fun WeatherScreen(
     val uiState by viewModel.uiState.collectAsState()
     val isFavorite by viewModel.isFavorite.collectAsState()
     val snackbarMessage by viewModel.snackbarMessage.collectAsState()
+    val userSettings by viewModel.userSettings.collectAsState()
     
     val snackbarHostState = remember { SnackbarHostState() }
 
@@ -139,7 +142,8 @@ fun WeatherScreen(
                         currentWeather = state.currentWeather,
                         forecast = state.forecast,
                         cityName = state.cityName,
-                        lastUpdated = state.lastUpdated
+                        lastUpdated = state.lastUpdated,
+                        userSettings = userSettings
                     )
                 }
 
@@ -172,7 +176,8 @@ private fun WeatherContent(
     currentWeather: CurrentWeather,
     forecast: List<DailyForecast>,
     cityName: String,
-    lastUpdated: Long
+    lastUpdated: Long,
+    userSettings: UserSettings
 ) {
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
@@ -184,7 +189,8 @@ private fun WeatherContent(
             CurrentWeatherSection(
                 currentWeather = currentWeather,
                 cityName = cityName,
-                lastUpdated = lastUpdated
+                lastUpdated = lastUpdated,
+                userSettings = userSettings
             )
         }
 
@@ -199,7 +205,7 @@ private fun WeatherContent(
 
         // Forecast Items
         items(forecast) { day ->
-            ForecastItem(day)
+            ForecastItem(day, userSettings)
         }
     }
 }
@@ -208,7 +214,8 @@ private fun WeatherContent(
 private fun CurrentWeatherSection(
     currentWeather: CurrentWeather,
     cityName: String,
-    lastUpdated: Long
+    lastUpdated: Long,
+    userSettings: UserSettings
 ) {
     Card(
         modifier = Modifier.fillMaxWidth(),
@@ -238,7 +245,7 @@ private fun CurrentWeatherSection(
 
             // Temperature (large)
             Text(
-                text = "${currentWeather.temperature.toInt()}°C",
+                text = UnitConverter.formatTemperature(currentWeather.temperature, userSettings.temperatureUnit),
                 style = MaterialTheme.typography.displayLarge,
                 color = MaterialTheme.colorScheme.primary
             )
@@ -259,11 +266,11 @@ private fun CurrentWeatherSection(
             ) {
                 WeatherDetail(
                     label = "Feels Like",
-                    value = "${currentWeather.apparentTemperature.toInt()}°C"
+                    value = UnitConverter.formatTemperature(currentWeather.apparentTemperature, userSettings.temperatureUnit)
                 )
                 WeatherDetail(
                     label = "Wind",
-                    value = "${currentWeather.windSpeed.toInt()} km/h"
+                    value = UnitConverter.formatWindSpeed(currentWeather.windSpeed, userSettings.windUnit)
                 )
                 WeatherDetail(
                     label = "Humidity",
@@ -297,7 +304,7 @@ private fun WeatherDetail(label: String, value: String) {
 }
 
 @Composable
-private fun ForecastItem(day: DailyForecast) {
+private fun ForecastItem(day: DailyForecast, userSettings: UserSettings) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
@@ -328,11 +335,11 @@ private fun ForecastItem(day: DailyForecast) {
                 modifier = Modifier.weight(1f)
             ) {
                 Text(
-                    text = "${day.temperatureMax.toInt()}°C",
+                    text = UnitConverter.formatTemperature(day.temperatureMax, userSettings.temperatureUnit),
                     style = MaterialTheme.typography.titleMedium
                 )
                 Text(
-                    text = "${day.temperatureMin.toInt()}°C",
+                    text = UnitConverter.formatTemperature(day.temperatureMin, userSettings.temperatureUnit),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
