@@ -1,13 +1,12 @@
 package com.giruai.climatest.domain.usecase
 
-import com.giruai.climatest.domain.model.City
 import com.giruai.climatest.domain.repository.FavoritesRepository
 import javax.inject.Inject
 
-class AddFavoriteUseCase @Inject constructor(
+class IsFavoriteUseCase @Inject constructor(
     private val repository: FavoritesRepository
 ) {
-    suspend operator fun invoke(city: City): Result<Unit> {
-        return repository.addFavorite(city)
+    suspend operator fun invoke(cityId: Long): Boolean {
+        return repository.isFavorite(cityId)
     }
 }
