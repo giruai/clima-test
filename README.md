@@ -17,18 +17,18 @@ Android weather app with city search, 5-day forecast, favorites, and geolocation
 
 <table>
   <tr>
-    <td><img src="screenshots/01-weather.png" width="200"/><br/><b>Weather Screen</b></td>
-    <td><img src="screenshots/02-settings.png" width="200"/><br/><b>Settings</b></td>
-    <td><img src="screenshots/03-favorites.png" width="200"/><br/><b>Favorites</b></td>
+    <td><img src="screenshots/01-weather.png" width="200"/><br/><b>Weather — Buenos Aires</b><br/>Reverse geocoding + unit conversions</td>
+    <td><img src="screenshots/02-settings.png" width="200"/><br/><b>Settings</b><br/>Unit preferences + permissions</td>
+    <td><img src="screenshots/03-favorites.png" width="200"/><br/><b>Favorites (Empty)</b><br/>Empty state with guidance</td>
   </tr>
   <tr>
-    <td><img src="screenshots/04-search.png" width="200"/><br/><b>City Search</b></td>
+    <td><img src="screenshots/04-search.png" width="200"/><br/><b>City Search</b><br/>Recent searches + autocomplete</td>
     <td></td>
     <td></td>
   </tr>
 </table>
 
-*Tested on Moto G60s (Android 12)*
+*Tested on Moto G60s (Android 12) — All features verified on device*
 
 ## 🛠️ Tech Stack
 
@@ -87,9 +87,9 @@ adb install -r app/build/outputs/apk/debug/app-debug.apk
 
 ## 📊 Project Status
 
-**Current Phase:** Development (Sprint 4 — Settings & Polish)
+**Current Phase:** Development (Sprint 5 — Launch)
 
-**Progress:** 89/117 pts (76% of MVP) | **Velocity:** ~10 pts/hour
+**Progress:** 105/127 pts (83% of MVP) | **Velocity:** ~10 pts/hour
 
 ### Sprint Progress
 - **Sprint 1 — Foundation** (29/29 pts) ✅ **COMPLETE**
@@ -110,25 +110,25 @@ adb install -r app/build/outputs/apk/debug/app-debug.apk
   - ✅ S4.3: Build Favorites Screen UI (list, delete confirmation, empty state)
   - ✅ S4.4: Add to Favorites Button (FAB with snackbar confirmation)
 
-- **Sprint 4 — Settings & Polish** (12/21 pts) 🔄 **IN PROGRESS**
-  - ✅ S5.1: Settings Manager (SharedPreferences repository + 7 tests)
-  - ✅ S5.2: Settings Screen UI + Bottom Navigation
+- **Sprint 4 — Settings & Polish** (27/27 pts) ✅ **COMPLETE**
+  - ✅ S5.1: Settings Manager (SharedPreferences + 7 tests)
+  - ✅ S5.2: Settings Screen UI + Bottom Navigation (visible in all states)
   - ✅ S5.3: Unit Conversions (°C/°F, km/h/mph + 10 tests)
-  - ⏳ S6.1: Material 3 Theme (5 pts)
-  - ⏳ S6.2: Loading & Error States Polish (5 pts)
-  - ⏳ Reverse Geocoding for City Names (Issue #25, 6 pts)
+  - ✅ S6.1: Material 3 Theme (audit, already implemented)
+  - ✅ S6.2: Loading & Error States (audit + retry button)
+  - ✅ Reverse Geocoding ("Buenos Aires, AR" instead of coords + 7 tests)
 
 ### Milestones
 - ✅ [Sprint 1 — Foundation](https://github.com/giruai/clima-test/milestone/1) (29 pts) — CLOSED
 - ✅ [Sprint 2 — Weather Display](https://github.com/giruai/clima-test/milestone/2) (26 pts) — CLOSED
 - ✅ [Sprint 3 — Favorites](https://github.com/giruai/clima-test/milestone/3) (23 pts) — CLOSED
-- 🔄 [Sprint 4 — Settings & Polish](https://github.com/giruai/clima-test/milestone/4) (21 pts) — IN PROGRESS
+- ✅ [Sprint 4 — Settings & Polish](https://github.com/giruai/clima-test/milestone/4) (27 pts) — CLOSED
 - [Sprint 5 — Launch](https://github.com/giruai/clima-test/milestone/5) (18 pts)
 
 [View all issues →](https://github.com/giruai/clima-test/issues)
 
 ### Recent Activity
-- **2026-02-26**: Settings implementation — Unit conversions (°C/°F, km/h/mph) + bottom navigation (PR #31, #32, #33)
+- **2026-02-25**: Sprint 4 complete — Settings, unit conversions, Material 3 theme, loading/error states, reverse geocoding (6 PRs: #31-#36)
 - **2026-02-25**: Sprint 3 complete — Favorites flow (database, UI, add/delete) with end-to-end device testing (PR #30)
 - **2026-02-25**: Sprint 2 complete — Search Screen UI with autocomplete, recent searches, navigation (PR #27)
 
@@ -157,4 +157,4 @@ Product Owner: Franco (@noscr33n)
 
 ---
 
-**Last updated:** 2026-02-26
+**Last updated:** 2026-02-25
