@@ -144,23 +144,26 @@ class WeatherViewModel @Inject constructor(
     }
 
     fun addToFavorites() {
+        Timber.d("addToFavorites called, currentCity=$currentCity")
         val city = currentCity
         if (city == null) {
+            Timber.w("Cannot add favorite: currentCity is null")
             _snackbarMessage.value = "No city loaded"
             return
         }
 
+        Timber.d("Adding city to favorites: id=${city.id}, name=${city.name}, lat=${city.latitude}, lon=${city.longitude}")
         viewModelScope.launch {
             val result = addFavorite(city)
             result.onSuccess {
-                Timber.d("Added to favorites: ${city.name}")
+                Timber.d("Successfully added to favorites: ${city.name}")
                 _snackbarMessage.value = "Added to Favorites"
                 _isFavorite.value = true
             }.onFailure { error ->
                 Timber.e(error, "Failed to add favorite: ${city.name}")
                 val message = when {
                     error.message?.contains("10") == true -> "Maximum 10 favorites reached"
-                    else -> "Failed to add favorite"
+                    else -> "Failed to add favorite: ${error.message}"
                 }
                 _snackbarMessage.value = message
             }
@@ -172,9 +175,11 @@ class WeatherViewModel @Inject constructor(
     }
 
     private fun generateCityId(latitude: Double, longitude: Double): Long {
-        // Simple hash of coordinates to generate stable ID
+        // Simple hash of coordinates to generate stable positive ID
         val latInt = (latitude * 100000).toLong()
         val lonInt = (longitude * 100000).toLong()
-        return (latInt shl 32) or (lonInt and 0xFFFFFFFFL)
+        val combined = latInt * 1000000L + lonInt
+        // Ensure positive by taking absolute value
+        return Math.abs(combined)
     }
 }
