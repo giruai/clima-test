@@ -70,7 +70,9 @@ adb install -r app/build/outputs/apk/debug/app-debug.apk
 
 ## 📊 Project Status
 
-**Current Phase:** Development (Sprint 2)
+**Current Phase:** Development (Sprint 3 — Favorites)
+
+**Progress:** 55/117 pts (47% of MVP) | **Velocity:** ~10 pts/hour
 
 ### Sprint Progress
 - **Sprint 1 — Foundation** (29/29 pts) ✅ **COMPLETE**
@@ -80,19 +82,30 @@ adb install -r app/build/outputs/apk/debug/app-debug.apk
   - ✅ S2.1: Implement Location Provider
   - ✅ S2.2: Integrate Open-Meteo API
   
-- **Sprint 2 — Weather Display** (13/26 pts) 🟢 In Progress
+- **Sprint 2 — Weather Display** (26/26 pts) ✅ **COMPLETE**
   - ✅ S2.3: Build Weather Screen UI
-  - 🔄 S3.1: Implement City Search API
-  - ⏳ S3.2: Build Search Screen UI
+  - ✅ S3.1: Implement City Search API
+  - ✅ S3.2: Build Search Screen UI (7/7 ACs verified on device)
+
+- **Sprint 3 — Favorites** (0/23 pts) 🔄 **NEXT**
+  - ⏳ S4.1: Implement Favorites Repository
+  - ⏳ S4.2: Build Favorites Screen UI
+  - ⏳ S4.3: Add to Favorites from Weather Screen
+  - ⏳ S4.4: Remove from Favorites
 
 ### Milestones
-- [Sprint 1 — Foundation](https://github.com/giruai/clima-test/milestone/1) (29 pts)
-- [Sprint 2 — Weather Display](https://github.com/giruai/clima-test/milestone/2) (26 pts)
-- [Sprint 3 — Favorites](https://github.com/giruai/clima-test/milestone/3) (23 pts)
+- ✅ [Sprint 1 — Foundation](https://github.com/giruai/clima-test/milestone/1) (29 pts) — CLOSED
+- ✅ [Sprint 2 — Weather Display](https://github.com/giruai/clima-test/milestone/2) (26 pts) — CLOSED
+- 🔄 [Sprint 3 — Favorites](https://github.com/giruai/clima-test/milestone/3) (23 pts)
 - [Sprint 4 — Settings & Polish](https://github.com/giruai/clima-test/milestone/4) (21 pts)
 - [Sprint 5 — Launch](https://github.com/giruai/clima-test/milestone/5) (18 pts)
 
 [View all issues →](https://github.com/giruai/clima-test/issues)
+
+### Recent Activity
+- **2026-02-25**: Sprint 2 complete — Search Screen UI with autocomplete, recent searches, navigation (PR #27)
+- **2026-02-25**: 3 critical bugs fixed during device testing (PermissionHandler crash, location fallback, nav args)
+- **2026-02-24**: Sprint 1 complete — Weather Screen UI with location & API integration (PR #24)
 
 ## 🧪 Testing
 
@@ -119,4 +132,4 @@ Product Owner: Franco (@noscr33n)
 
 ---
 
-**Last updated:** 2026-02-24
+**Last updated:** 2026-02-25
