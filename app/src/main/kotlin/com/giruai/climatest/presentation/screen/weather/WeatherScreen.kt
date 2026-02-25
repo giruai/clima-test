@@ -5,6 +5,9 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.outlined.Star
 import androidx.compose.material.pullrefresh.PullRefreshIndicator
@@ -77,75 +80,90 @@ fun WeatherScreen(
         onRefresh = { viewModel.refresh() }
     )
 
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .pullRefresh(pullRefreshState)
-    ) {
-        when (val state = uiState) {
-            is WeatherUiState.Loading -> {
-                LoadingIndicator()
-            }
-
-            is WeatherUiState.Success -> {
-                WeatherContent(
-                    currentWeather = state.currentWeather,
-                    forecast = state.forecast,
-                    cityName = state.cityName,
-                    lastUpdated = state.lastUpdated,
-                    onNavigateToSearch = onNavigateToSearch,
-                    onNavigateToFavorites = onNavigateToFavorites,
-                    onNavigateToSettings = onNavigateToSettings
+    Scaffold(
+        bottomBar = {
+            NavigationBar {
+                NavigationBarItem(
+                    icon = { Icon(Icons.Filled.Search, contentDescription = "Search") },
+                    label = { Text("Search") },
+                    selected = false,
+                    onClick = onNavigateToSearch
+                )
+                NavigationBarItem(
+                    icon = { Icon(Icons.Filled.Favorite, contentDescription = "Favorites") },
+                    label = { Text("Favorites") },
+                    selected = false,
+                    onClick = onNavigateToFavorites
+                )
+                NavigationBarItem(
+                    icon = { Icon(Icons.Filled.Settings, contentDescription = "Settings") },
+                    label = { Text("Settings") },
+                    selected = false,
+                    onClick = onNavigateToSettings
                 )
             }
-
-            is WeatherUiState.Error -> {
-                ErrorMessage(
-                    message = state.message,
-                    onRetry = { viewModel.refresh() }
-                )
+        },
+        floatingActionButton = {
+            if (uiState is WeatherUiState.Success) {
+                FloatingActionButton(
+                    onClick = { viewModel.addToFavorites() },
+                    containerColor = if (isFavorite)
+                        MaterialTheme.colorScheme.primaryContainer
+                    else
+                        MaterialTheme.colorScheme.primary
+                ) {
+                    Icon(
+                        imageVector = if (isFavorite) Icons.Filled.Star else Icons.Outlined.Star,
+                        contentDescription = if (isFavorite) "Already in favorites" else "Add to favorites"
+                    )
+                }
             }
-
-            is WeatherUiState.PermissionRequired -> {
-                PermissionRequiredContent(
-                    onRequestPermission = { permissionHandler.requestPermission() },
-                    onNavigateToSearch = onNavigateToSearch
-                )
-            }
+        },
+        snackbarHost = {
+            SnackbarHost(hostState = snackbarHostState)
         }
-
-        PullRefreshIndicator(
-            refreshing = isRefreshing,
-            state = pullRefreshState,
-            modifier = Modifier.align(Alignment.TopCenter)
-        )
-
-        // Add to Favorites FAB (only show when weather loaded)
-        if (uiState is WeatherUiState.Success) {
-            FloatingActionButton(
-                onClick = { viewModel.addToFavorites() },
-                modifier = Modifier
-                    .align(Alignment.BottomEnd)
-                    .padding(16.dp),
-                containerColor = if (isFavorite) 
-                    MaterialTheme.colorScheme.primaryContainer 
-                else 
-                    MaterialTheme.colorScheme.primary
-            ) {
-                Icon(
-                    imageVector = if (isFavorite) Icons.Filled.Star else Icons.Outlined.Star,
-                    contentDescription = if (isFavorite) "Already in favorites" else "Add to favorites"
-                )
-            }
-        }
-
-        // Snackbar host at bottom
-        SnackbarHost(
-            hostState = snackbarHostState,
+    ) { paddingValues ->
+        Box(
             modifier = Modifier
-                .align(Alignment.BottomCenter)
-                .padding(bottom = 80.dp) // Above FAB
-        )
+                .fillMaxSize()
+                .padding(paddingValues)
+                .pullRefresh(pullRefreshState)
+        ) {
+            when (val state = uiState) {
+                is WeatherUiState.Loading -> {
+                    LoadingIndicator()
+                }
+
+                is WeatherUiState.Success -> {
+                    WeatherContent(
+                        currentWeather = state.currentWeather,
+                        forecast = state.forecast,
+                        cityName = state.cityName,
+                        lastUpdated = state.lastUpdated
+                    )
+                }
+
+                is WeatherUiState.Error -> {
+                    ErrorMessage(
+                        message = state.message,
+                        onRetry = { viewModel.refresh() }
+                    )
+                }
+
+                is WeatherUiState.PermissionRequired -> {
+                    PermissionRequiredContent(
+                        onRequestPermission = { permissionHandler.requestPermission() },
+                        onNavigateToSearch = onNavigateToSearch
+                    )
+                }
+            }
+
+            PullRefreshIndicator(
+                refreshing = isRefreshing,
+                state = pullRefreshState,
+                modifier = Modifier.align(Alignment.TopCenter)
+            )
+        }
     }
 }
 
@@ -154,10 +172,7 @@ private fun WeatherContent(
     currentWeather: CurrentWeather,
     forecast: List<DailyForecast>,
     cityName: String,
-    lastUpdated: Long,
-    onNavigateToSearch: () -> Unit,
-    onNavigateToFavorites: () -> Unit,
-    onNavigateToSettings: () -> Unit
+    lastUpdated: Long
 ) {
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
@@ -185,33 +200,6 @@ private fun WeatherContent(
         // Forecast Items
         items(forecast) { day ->
             ForecastItem(day)
-        }
-
-        // Navigation Buttons (Temporary - will be replaced by proper nav)
-        item {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                Button(
-                    onClick = onNavigateToSearch,
-                    modifier = Modifier.weight(1f)
-                ) {
-                    Text("Search")
-                }
-                Button(
-                    onClick = onNavigateToFavorites,
-                    modifier = Modifier.weight(1f)
-                ) {
-                    Text("Favorites")
-                }
-                Button(
-                    onClick = onNavigateToSettings,
-                    modifier = Modifier.weight(1f)
-                ) {
-                    Text("Settings")
-                }
-            }
         }
     }
 }
