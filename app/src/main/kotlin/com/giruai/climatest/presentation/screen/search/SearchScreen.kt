@@ -91,7 +91,10 @@ fun SearchScreen(
                 }
 
                 is SearchUiState.Error -> {
-                    ErrorState(message = state.message)
+                    ErrorState(
+                        message = state.message,
+                        onRetry = { viewModel.onQueryChange(query) }
+                    )
                 }
             }
         }
@@ -271,14 +274,14 @@ private fun NoResultsState() {
 }
 
 @Composable
-private fun ErrorState(message: String) {
+private fun ErrorState(message: String, onRetry: () -> Unit) {
     Box(
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
     ) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(8.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp),
             modifier = Modifier.padding(32.dp)
         ) {
             Text(
@@ -291,6 +294,9 @@ private fun ErrorState(message: String) {
                 textAlign = TextAlign.Center,
                 color = MaterialTheme.colorScheme.error
             )
+            Button(onClick = onRetry) {
+                Text("Retry")
+            }
         }
     }
 }
