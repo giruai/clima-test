@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.giruai.climatest.data.local.preferences.SettingsManager
 import com.giruai.climatest.data.local.preferences.UserSettings
+import com.giruai.climatest.data.location.ReverseGeocoder
 import com.giruai.climatest.domain.location.LocationProvider
 import com.giruai.climatest.domain.model.City
 import com.giruai.climatest.domain.usecase.AddFavoriteUseCase
@@ -27,6 +28,7 @@ class WeatherViewModel @Inject constructor(
     private val getForecast: GetForecastUseCase,
     private val addFavorite: AddFavoriteUseCase,
     private val isFavoriteUseCase: IsFavoriteUseCase,
+    private val reverseGeocoder: ReverseGeocoder,
     settingsManager: SettingsManager
 ) : ViewModel() {
 
@@ -98,7 +100,7 @@ class WeatherViewModel @Inject constructor(
                     // Fetch forecast
                     val forecastResult = getForecast(latitude, longitude)
                     forecastResult.onSuccess { forecast ->
-                        val cityName = formatCityName(latitude, longitude)
+                        val cityName = reverseGeocoder.getCityName(latitude, longitude)
                         _uiState.value = WeatherUiState.Success(
                             currentWeather = currentWeather,
                             forecast = forecast,
@@ -106,11 +108,16 @@ class WeatherViewModel @Inject constructor(
                             lastUpdated = System.currentTimeMillis()
                         )
                         
+                        // Extract country from cityName (format: "City, CC")
+                        val parts = cityName.split(", ")
+                        val city = parts.firstOrNull() ?: cityName
+                        val country = if (parts.size > 1) parts.last() else "Unknown"
+                        
                         // Store current city for favorites
                         currentCity = City(
                             id = generateCityId(latitude, longitude),
-                            name = cityName,
-                            country = "Unknown", // Will be improved with reverse geocoding
+                            name = city,
+                            country = country,
                             latitude = latitude,
                             longitude = longitude
                         )
@@ -140,12 +147,6 @@ class WeatherViewModel @Inject constructor(
     fun refresh() {
         Timber.d("Refreshing weather data")
         loadWeather()
-    }
-
-    private fun formatCityName(latitude: Double, longitude: Double): String {
-        // TODO: Implement reverse geocoding for proper city name
-        // For now, show coordinates or "Current Location"
-        return String.format("%.2f°, %.2f°", latitude, longitude)
     }
 
     private fun checkIfFavorite() {
