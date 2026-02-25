@@ -13,6 +13,23 @@ Android weather app with city search, 5-day forecast, favorites, and geolocation
 - ⭐ **Favorites**: Save up to 10 cities for quick access
 - ⚙️ **Settings**: Customize units (°C/°F, km/h/mph)
 
+## 📸 Screenshots
+
+<table>
+  <tr>
+    <td><img src="screenshots/01-weather-with-fab.png" width="200"/><br/><b>Weather Screen</b></td>
+    <td><img src="screenshots/02-favorite-added.png" width="200"/><br/><b>Add to Favorites</b></td>
+    <td><img src="screenshots/03-favorites-list.png" width="200"/><br/><b>Favorites List</b></td>
+  </tr>
+  <tr>
+    <td><img src="screenshots/04-delete-confirmation.png" width="200"/><br/><b>Delete Confirmation</b></td>
+    <td><img src="screenshots/05-empty-state.png" width="200"/><br/><b>Empty State</b></td>
+    <td><img src="screenshots/06-search-screen.png" width="200"/><br/><b>City Search</b></td>
+  </tr>
+</table>
+
+*Tested on Moto G60s (Android 12)*
+
 ## 🛠️ Tech Stack
 
 | Component | Technology |
@@ -70,9 +87,9 @@ adb install -r app/build/outputs/apk/debug/app-debug.apk
 
 ## 📊 Project Status
 
-**Current Phase:** Development (Sprint 3 — Favorites)
+**Current Phase:** Development (Sprint 4 — Settings & Polish)
 
-**Progress:** 55/117 pts (47% of MVP) | **Velocity:** ~10 pts/hour
+**Progress:** 78/117 pts (67% of MVP) | **Velocity:** ~10 pts/hour
 
 ### Sprint Progress
 - **Sprint 1 — Foundation** (29/29 pts) ✅ **COMPLETE**
@@ -87,24 +104,30 @@ adb install -r app/build/outputs/apk/debug/app-debug.apk
   - ✅ S3.1: Implement City Search API
   - ✅ S3.2: Build Search Screen UI (7/7 ACs verified on device)
 
-- **Sprint 3 — Favorites** (0/23 pts) 🔄 **NEXT**
-  - ⏳ S4.1: Implement Favorites Repository
-  - ⏳ S4.2: Build Favorites Screen UI
-  - ⏳ S4.3: Add to Favorites from Weather Screen
-  - ⏳ S4.4: Remove from Favorites
+- **Sprint 3 — Favorites** (23/23 pts) ✅ **COMPLETE**
+  - ✅ S4.1: Implement Favorites Database (Room + DAO)
+  - ✅ S4.2: Implement Favorites Use Cases (max 10 enforcement)
+  - ✅ S4.3: Build Favorites Screen UI (list, delete confirmation, empty state)
+  - ✅ S4.4: Add to Favorites Button (FAB with snackbar confirmation)
+
+- **Sprint 4 — Settings & Polish** (0/21 pts) 🔄 **NEXT**
+  - ⏳ S5.1: Build Settings Screen (units, theme, about)
+  - ⏳ S5.2: Implement Unit Conversions
+  - ⏳ S5.3: Error Handling Polish
+  - ⏳ S5.4: Reverse Geocoding for City Names
 
 ### Milestones
 - ✅ [Sprint 1 — Foundation](https://github.com/giruai/clima-test/milestone/1) (29 pts) — CLOSED
 - ✅ [Sprint 2 — Weather Display](https://github.com/giruai/clima-test/milestone/2) (26 pts) — CLOSED
-- 🔄 [Sprint 3 — Favorites](https://github.com/giruai/clima-test/milestone/3) (23 pts)
-- [Sprint 4 — Settings & Polish](https://github.com/giruai/clima-test/milestone/4) (21 pts)
+- ✅ [Sprint 3 — Favorites](https://github.com/giruai/clima-test/milestone/3) (23 pts) — CLOSED
+- 🔄 [Sprint 4 — Settings & Polish](https://github.com/giruai/clima-test/milestone/4) (21 pts)
 - [Sprint 5 — Launch](https://github.com/giruai/clima-test/milestone/5) (18 pts)
 
 [View all issues →](https://github.com/giruai/clima-test/issues)
 
 ### Recent Activity
+- **2026-02-25**: Sprint 3 complete — Favorites flow (database, UI, add/delete) with end-to-end device testing (PR #30)
 - **2026-02-25**: Sprint 2 complete — Search Screen UI with autocomplete, recent searches, navigation (PR #27)
-- **2026-02-25**: 3 critical bugs fixed during device testing (PermissionHandler crash, location fallback, nav args)
 - **2026-02-24**: Sprint 1 complete — Weather Screen UI with location & API integration (PR #24)
 
 ## 🧪 Testing
