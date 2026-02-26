@@ -21,32 +21,15 @@ import com.giruai.climatest.data.local.preferences.WindUnit
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsScreen(
-    onBack: () -> Unit,
     viewModel: SettingsViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val context = LocalContext.current
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text("Settings") },
-                navigationIcon = {
-                    IconButton(onClick = onBack) {
-                        Icon(
-                            imageVector = Icons.Filled.ArrowBack,
-                            contentDescription = "Back"
-                        )
-                    }
-                }
-            )
-        }
-    ) { paddingValues ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
-                .padding(16.dp),
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(24.dp)
         ) {
             // Units Section
@@ -108,7 +91,6 @@ fun SettingsScreen(
                 }
             }
         }
-    }
 }
 
 @Composable

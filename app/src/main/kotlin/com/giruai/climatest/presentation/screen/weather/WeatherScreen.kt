@@ -36,9 +36,6 @@ import java.util.*
 fun WeatherScreen(
     initialLatitude: Double? = null,
     initialLongitude: Double? = null,
-    onNavigateToSearch: () -> Unit,
-    onNavigateToFavorites: () -> Unit,
-    onNavigateToSettings: () -> Unit,
     viewModel: WeatherViewModel = hiltViewModel()
 ) {
     // Pass initial coords to ViewModel if provided
@@ -84,28 +81,6 @@ fun WeatherScreen(
     )
 
     Scaffold(
-        bottomBar = {
-            NavigationBar {
-                NavigationBarItem(
-                    icon = { Icon(Icons.Filled.Search, contentDescription = "Search") },
-                    label = { Text("Search") },
-                    selected = false,
-                    onClick = onNavigateToSearch
-                )
-                NavigationBarItem(
-                    icon = { Icon(Icons.Filled.Favorite, contentDescription = "Favorites") },
-                    label = { Text("Favorites") },
-                    selected = false,
-                    onClick = onNavigateToFavorites
-                )
-                NavigationBarItem(
-                    icon = { Icon(Icons.Filled.Settings, contentDescription = "Settings") },
-                    label = { Text("Settings") },
-                    selected = false,
-                    onClick = onNavigateToSettings
-                )
-            }
-        },
         floatingActionButton = {
             if (uiState is WeatherUiState.Success) {
                 FloatingActionButton(
@@ -156,8 +131,7 @@ fun WeatherScreen(
 
                 is WeatherUiState.PermissionRequired -> {
                     PermissionRequiredContent(
-                        onRequestPermission = { permissionHandler.requestPermission() },
-                        onNavigateToSearch = onNavigateToSearch
+                        onRequestPermission = { permissionHandler.requestPermission() }
                     )
                 }
             }
@@ -350,8 +324,7 @@ private fun ForecastItem(day: DailyForecast, userSettings: UserSettings) {
 
 @Composable
 private fun PermissionRequiredContent(
-    onRequestPermission: () -> Unit,
-    onNavigateToSearch: () -> Unit
+    onRequestPermission: () -> Unit
 ) {
     Box(
         modifier = Modifier.fillMaxSize(),
@@ -372,16 +345,13 @@ private fun PermissionRequiredContent(
                 textAlign = TextAlign.Center
             )
             Text(
-                text = "ClimaApp needs your location to show weather for your area.",
+                text = "ClimaApp needs your location to show weather for your area. Or use the Search tab to find a city.",
                 style = MaterialTheme.typography.bodyLarge,
                 textAlign = TextAlign.Center,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
             Button(onClick = onRequestPermission) {
                 Text("Enable Location")
-            }
-            TextButton(onClick = onNavigateToSearch) {
-                Text("Search for a city instead")
             }
         }
     }

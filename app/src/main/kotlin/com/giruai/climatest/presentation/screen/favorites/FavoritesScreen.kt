@@ -25,7 +25,6 @@ import com.giruai.climatest.presentation.components.LoadingIndicator
 @Composable
 fun FavoritesScreen(
     onCitySelected: (Long, Double, Double) -> Unit,
-    onBack: () -> Unit,
     viewModel: FavoritesViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -37,27 +36,11 @@ fun FavoritesScreen(
         onRefresh = { viewModel.refresh() }
     )
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text("Favorites") },
-                navigationIcon = {
-                    IconButton(onClick = onBack) {
-                        Icon(
-                            imageVector = Icons.Default.ArrowBack,
-                            contentDescription = "Back"
-                        )
-                    }
-                }
-            )
-        }
-    ) { paddingValues ->
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
-                .pullRefresh(pullRefreshState)
-        ) {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .pullRefresh(pullRefreshState)
+    ) {
             when (val state = uiState) {
                 is FavoritesUiState.Loading -> {
                     LoadingIndicator()
@@ -86,7 +69,6 @@ fun FavoritesScreen(
                 modifier = Modifier.align(Alignment.TopCenter)
             )
         }
-    }
 
     // Delete confirmation dialog
     showDeleteDialog?.let { (cityId, cityName) ->
