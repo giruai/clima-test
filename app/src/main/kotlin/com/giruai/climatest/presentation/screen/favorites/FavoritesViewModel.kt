@@ -2,6 +2,8 @@ package com.giruai.climatest.presentation.screen.favorites
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.giruai.climatest.data.location.ReverseGeocoder
+import com.giruai.climatest.domain.model.City
 import com.giruai.climatest.domain.usecase.GetFavoritesUseCase
 import com.giruai.climatest.domain.usecase.RemoveFavoriteUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -17,7 +19,8 @@ import javax.inject.Inject
 @HiltViewModel
 class FavoritesViewModel @Inject constructor(
     private val getFavorites: GetFavoritesUseCase,
-    private val removeFavorite: RemoveFavoriteUseCase
+    private val removeFavorite: RemoveFavoriteUseCase,
+    private val reverseGeocoder: ReverseGeocoder
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow<FavoritesUiState>(FavoritesUiState.Loading)
@@ -33,10 +36,28 @@ class FavoritesViewModel @Inject constructor(
     private fun observeFavorites() {
         getFavorites()
             .onEach { favorites ->
-                _uiState.value = if (favorites.isEmpty()) {
-                    FavoritesUiState.Empty
+                if (favorites.isEmpty()) {
+                    _uiState.value = FavoritesUiState.Empty
                 } else {
-                    FavoritesUiState.Success(favorites)
+                    // Resolve city names for favorites with unknown/coordinate names
+                    val resolved = favorites.map { city ->
+                        if (city.name.contains("°") || city.country == "Unknown") {
+                            val cityName = reverseGeocoder.getCityName(city.latitude, city.longitude)
+                            val parts = cityName.split(", ")
+                            val name = parts.firstOrNull() ?: city.name
+                            val country = if (parts.size > 1) parts.last() else city.country
+                            City(
+                                id = city.id,
+                                name = name,
+                                country = country,
+                                latitude = city.latitude,
+                                longitude = city.longitude
+                            )
+                        } else {
+                            city
+                        }
+                    }
+                    _uiState.value = FavoritesUiState.Success(resolved)
                 }
             }
             .launchIn(viewModelScope)
