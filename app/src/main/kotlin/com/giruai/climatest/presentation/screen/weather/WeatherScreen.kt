@@ -22,11 +22,8 @@ import com.giruai.climatest.domain.model.CurrentWeather
 import com.giruai.climatest.domain.model.DailyForecast
 import com.giruai.climatest.domain.model.WeatherCondition
 import com.giruai.climatest.presentation.components.ErrorMessage
-import com.giruai.climatest.presentation.components.GlassPill
 import com.giruai.climatest.presentation.components.LoadingIndicator
-import com.giruai.climatest.presentation.components.TemperatureDisplay
 import com.giruai.climatest.presentation.components.WeatherBackground
-import com.giruai.climatest.presentation.components.WeatherHero
 import com.giruai.climatest.presentation.components.WeatherIcon
 import com.giruai.climatest.presentation.util.UnitConverter
 import com.giruai.climatest.presentation.util.rememberLocationPermissionHandler
