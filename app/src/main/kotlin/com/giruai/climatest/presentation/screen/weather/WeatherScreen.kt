@@ -5,9 +5,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material.icons.filled.Search
-import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.outlined.Star
 import androidx.compose.material.pullrefresh.PullRefreshIndicator
@@ -31,7 +28,7 @@ import com.giruai.climatest.presentation.util.rememberLocationPermissionHandler
 import java.text.SimpleDateFormat
 import java.util.*
 
-@OptIn(ExperimentalMaterialApi::class)
+@OptIn(ExperimentalMaterialApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun WeatherScreen(
     initialLatitude: Double? = null,
@@ -80,22 +77,31 @@ fun WeatherScreen(
         onRefresh = { viewModel.refresh() }
     )
 
+    // Get city name for TopAppBar
+    val topBarTitle = when (val state = uiState) {
+        is WeatherUiState.Success -> state.cityName
+        else -> "Weather"
+    }
+
     Scaffold(
-        floatingActionButton = {
-            if (uiState is WeatherUiState.Success) {
-                FloatingActionButton(
-                    onClick = { viewModel.addToFavorites() },
-                    containerColor = if (isFavorite)
-                        MaterialTheme.colorScheme.primaryContainer
-                    else
-                        MaterialTheme.colorScheme.primary
-                ) {
-                    Icon(
-                        imageVector = if (isFavorite) Icons.Filled.Star else Icons.Outlined.Star,
-                        contentDescription = if (isFavorite) "Already in favorites" else "Add to favorites"
-                    )
+        topBar = {
+            TopAppBar(
+                title = { Text(topBarTitle) },
+                actions = {
+                    if (uiState is WeatherUiState.Success) {
+                        IconButton(onClick = { viewModel.addToFavorites() }) {
+                            Icon(
+                                imageVector = if (isFavorite) Icons.Filled.Star else Icons.Outlined.Star,
+                                contentDescription = if (isFavorite) "Remove from favorites" else "Add to favorites",
+                                tint = if (isFavorite)
+                                    MaterialTheme.colorScheme.primary
+                                else
+                                    MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                    }
                 }
-            }
+            )
         },
         snackbarHost = {
             SnackbarHost(hostState = snackbarHostState)
