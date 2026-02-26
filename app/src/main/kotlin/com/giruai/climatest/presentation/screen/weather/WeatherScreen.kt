@@ -89,7 +89,7 @@ fun WeatherScreen(
                 title = { Text(topBarTitle) },
                 actions = {
                     if (uiState is WeatherUiState.Success) {
-                        IconButton(onClick = { viewModel.addToFavorites() }) {
+                        IconButton(onClick = { viewModel.toggleFavorite() }) {
                             Icon(
                                 imageVector = if (isFavorite) Icons.Filled.Star else Icons.Outlined.Star,
                                 contentDescription = if (isFavorite) "Remove from favorites" else "Add to favorites",
@@ -115,7 +115,7 @@ fun WeatherScreen(
         ) {
             when (val state = uiState) {
                 is WeatherUiState.Loading -> {
-                    LoadingIndicator()
+                    // LoadingIndicator removed - PullRefreshIndicator handles loading state
                 }
 
                 is WeatherUiState.Success -> {

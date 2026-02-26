@@ -11,6 +11,7 @@ import com.giruai.climatest.domain.usecase.AddFavoriteUseCase
 import com.giruai.climatest.domain.usecase.GetCurrentWeatherUseCase
 import com.giruai.climatest.domain.usecase.GetForecastUseCase
 import com.giruai.climatest.domain.usecase.IsFavoriteUseCase
+import com.giruai.climatest.domain.usecase.RemoveFavoriteUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -27,6 +28,7 @@ class WeatherViewModel @Inject constructor(
     private val getCurrentWeather: GetCurrentWeatherUseCase,
     private val getForecast: GetForecastUseCase,
     private val addFavorite: AddFavoriteUseCase,
+    private val removeFavorite: RemoveFavoriteUseCase,
     private val isFavoriteUseCase: IsFavoriteUseCase,
     private val reverseGeocoder: ReverseGeocoder,
     settingsManager: SettingsManager
@@ -156,29 +158,44 @@ class WeatherViewModel @Inject constructor(
         }
     }
 
-    fun addToFavorites() {
-        Timber.d("addToFavorites called, currentCity=$currentCity")
+    fun toggleFavorite() {
+        Timber.d("toggleFavorite called, currentCity=$currentCity, isFavorite=${_isFavorite.value}")
         val city = currentCity
         if (city == null) {
-            Timber.w("Cannot add favorite: currentCity is null")
+            Timber.w("Cannot toggle favorite: currentCity is null")
             _snackbarMessage.value = "No city loaded"
             return
         }
 
-        Timber.d("Adding city to favorites: id=${city.id}, name=${city.name}, lat=${city.latitude}, lon=${city.longitude}")
         viewModelScope.launch {
-            val result = addFavorite(city)
-            result.onSuccess {
-                Timber.d("Successfully added to favorites: ${city.name}")
-                _snackbarMessage.value = "Added to Favorites"
-                _isFavorite.value = true
-            }.onFailure { error ->
-                Timber.e(error, "Failed to add favorite: ${city.name}")
-                val message = when {
-                    error.message?.contains("10") == true -> "Maximum 10 favorites reached"
-                    else -> "Failed to add favorite: ${error.message}"
+            if (_isFavorite.value) {
+                // Remove from favorites
+                Timber.d("Removing city from favorites: id=${city.id}, name=${city.name}")
+                val result = removeFavorite(city.id)
+                result.onSuccess {
+                    Timber.d("Successfully removed from favorites: ${city.name}")
+                    _snackbarMessage.value = "Removed from Favorites"
+                    _isFavorite.value = false
+                }.onFailure { error ->
+                    Timber.e(error, "Failed to remove favorite: ${city.name}")
+                    _snackbarMessage.value = "Failed to remove favorite"
                 }
-                _snackbarMessage.value = message
+            } else {
+                // Add to favorites
+                Timber.d("Adding city to favorites: id=${city.id}, name=${city.name}, lat=${city.latitude}, lon=${city.longitude}")
+                val result = addFavorite(city)
+                result.onSuccess {
+                    Timber.d("Successfully added to favorites: ${city.name}")
+                    _snackbarMessage.value = "Added to Favorites"
+                    _isFavorite.value = true
+                }.onFailure { error ->
+                    Timber.e(error, "Failed to add favorite: ${city.name}")
+                    val message = when {
+                        error.message?.contains("10") == true -> "Maximum 10 favorites reached"
+                        else -> "Failed to add favorite: ${error.message}"
+                    }
+                    _snackbarMessage.value = message
+                }
             }
         }
     }
