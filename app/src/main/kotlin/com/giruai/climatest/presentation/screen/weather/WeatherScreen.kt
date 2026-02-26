@@ -22,8 +22,11 @@ import com.giruai.climatest.domain.model.CurrentWeather
 import com.giruai.climatest.domain.model.DailyForecast
 import com.giruai.climatest.domain.model.WeatherCondition
 import com.giruai.climatest.presentation.components.ErrorMessage
+import com.giruai.climatest.presentation.components.GlassPill
 import com.giruai.climatest.presentation.components.LoadingIndicator
+import com.giruai.climatest.presentation.components.TemperatureDisplay
 import com.giruai.climatest.presentation.components.WeatherBackground
+import com.giruai.climatest.presentation.components.WeatherHero
 import com.giruai.climatest.presentation.components.WeatherIcon
 import com.giruai.climatest.presentation.util.UnitConverter
 import com.giruai.climatest.presentation.util.rememberLocationPermissionHandler
@@ -223,93 +226,15 @@ private fun CurrentWeatherSection(
     lastUpdated: Long,
     userSettings: UserSettings
 ) {
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(24.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-            // City Name
-            if (cityName.isNotEmpty()) {
-                Text(
-                    text = cityName,
-                    style = MaterialTheme.typography.titleLarge,
-                    color = MaterialTheme.colorScheme.primary
-                )
-            }
-
-            // Weather Icon
-            WeatherIcon(
-                condition = currentWeather.weatherCondition,
-                large = true
-            )
-
-            // Temperature (large)
-            Text(
-                text = UnitConverter.formatTemperature(currentWeather.temperature, userSettings.temperatureUnit),
-                style = MaterialTheme.typography.displayLarge,
-                color = MaterialTheme.colorScheme.primary
-            )
-
-            // Weather Description
-            Text(
-                text = currentWeather.weatherCondition.description,
-                style = MaterialTheme.typography.titleMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-
-            Divider()
-
-            // Weather Details
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceEvenly
-            ) {
-                WeatherDetail(
-                    label = "Feels Like",
-                    value = UnitConverter.formatTemperature(currentWeather.apparentTemperature, userSettings.temperatureUnit)
-                )
-                WeatherDetail(
-                    label = "Wind",
-                    value = UnitConverter.formatWindSpeed(currentWeather.windSpeed, userSettings.windUnit)
-                )
-                WeatherDetail(
-                    label = "Humidity",
-                    value = "${currentWeather.humidity}%"
-                )
-            }
-
-            // Last Updated
-            Text(
-                text = "Updated ${formatLastUpdated(lastUpdated)}",
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-        }
-    }
+    // S7.3: Premium Weather Hero Card (replaces old card-based design)
+    WeatherHero(
+        currentWeather = currentWeather,
+        userSettings = userSettings
+    )
 }
 
 @Composable
-private fun WeatherDetail(label: String, value: String) {
-    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-        Text(
-            text = value,
-            style = MaterialTheme.typography.titleMedium
-        )
-        Text(
-            text = label,
-            style = MaterialTheme.typography.bodySmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
-        )
-    }
-}
 
-@Composable
 private fun ForecastItem(day: DailyForecast, userSettings: UserSettings) {
     Card(
         modifier = Modifier.fillMaxWidth(),
