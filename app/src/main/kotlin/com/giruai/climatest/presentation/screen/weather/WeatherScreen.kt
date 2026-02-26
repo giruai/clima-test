@@ -20,13 +20,17 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.giruai.climatest.data.local.preferences.UserSettings
 import com.giruai.climatest.domain.model.CurrentWeather
 import com.giruai.climatest.domain.model.DailyForecast
+import com.giruai.climatest.domain.model.WeatherCondition
 import com.giruai.climatest.presentation.components.ErrorMessage
 import com.giruai.climatest.presentation.components.LoadingIndicator
+import com.giruai.climatest.presentation.components.WeatherBackground
 import com.giruai.climatest.presentation.components.WeatherIcon
 import com.giruai.climatest.presentation.util.UnitConverter
 import com.giruai.climatest.presentation.util.rememberLocationPermissionHandler
 import java.text.SimpleDateFormat
-import java.util.*
+import java.util.Calendar
+import java.util.Date
+import java.util.Locale
 
 @OptIn(ExperimentalMaterialApi::class, ExperimentalMaterial3Api::class)
 @Composable
@@ -77,76 +81,98 @@ fun WeatherScreen(
         onRefresh = { viewModel.refresh() }
     )
 
-    // Get city name for TopAppBar
+    // Get city name and weather condition for TopAppBar and Background
     val topBarTitle = when (val state = uiState) {
         is WeatherUiState.Success -> state.cityName
         else -> "Weather"
     }
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text(topBarTitle) },
-                actions = {
-                    if (uiState is WeatherUiState.Success) {
-                        IconButton(onClick = { viewModel.toggleFavorite() }) {
-                            Icon(
-                                imageVector = if (isFavorite) Icons.Filled.Star else Icons.Outlined.Star,
-                                contentDescription = if (isFavorite) "Remove from favorites" else "Add to favorites",
-                                tint = if (isFavorite)
-                                    MaterialTheme.colorScheme.primary
-                                else
-                                    MaterialTheme.colorScheme.onSurfaceVariant
-                            )
+    // Get current weather condition for dynamic background
+    val currentWeatherCondition = when (val state = uiState) {
+        is WeatherUiState.Success -> state.currentWeather.weatherCondition
+        else -> WeatherCondition.UNKNOWN
+    }
+
+    // Determine if it's night (simplified - between 20:00 and 06:00)
+    val calendar = Calendar.getInstance()
+    val hourOfDay = calendar.get(Calendar.HOUR_OF_DAY)
+    val isNight = hourOfDay >= 20 || hourOfDay < 6
+
+    WeatherBackground(
+        weatherCondition = currentWeatherCondition,
+        isNight = isNight
+    ) {
+        Scaffold(
+            topBar = {
+                TopAppBar(
+                    title = { Text(topBarTitle) },
+                    actions = {
+                        if (uiState is WeatherUiState.Success) {
+                            IconButton(onClick = { viewModel.toggleFavorite() }) {
+                                Icon(
+                                    imageVector = if (isFavorite) Icons.Filled.Star else Icons.Outlined.Star,
+                                    contentDescription = if (isFavorite) "Remove from favorites" else "Add to favorites",
+                                    tint = if (isFavorite)
+                                        MaterialTheme.colorScheme.primary
+                                    else
+                                        MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            }
                         }
+                    },
+                    colors = TopAppBarDefaults.topAppBarColors(
+                        containerColor = androidx.compose.ui.graphics.Color.Transparent,
+                        titleContentColor = MaterialTheme.colorScheme.onBackground,
+                        actionIconContentColor = MaterialTheme.colorScheme.onBackground
+                    )
+                )
+            },
+            snackbarHost = {
+                SnackbarHost(hostState = snackbarHostState)
+            },
+            containerColor = androidx.compose.ui.graphics.Color.Transparent
+        ) { paddingValues ->
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(paddingValues)
+                    .pullRefresh(pullRefreshState)
+            ) {
+                when (val state = uiState) {
+                    is WeatherUiState.Loading -> {
+                        // LoadingIndicator removed - PullRefreshIndicator handles loading state
+                    }
+
+                    is WeatherUiState.Success -> {
+                        WeatherContent(
+                            currentWeather = state.currentWeather,
+                            forecast = state.forecast,
+                            cityName = state.cityName,
+                            lastUpdated = state.lastUpdated,
+                            userSettings = userSettings
+                        )
+                    }
+
+                    is WeatherUiState.Error -> {
+                        ErrorMessage(
+                            message = state.message,
+                            onRetry = { viewModel.refresh() }
+                        )
+                    }
+
+                    is WeatherUiState.PermissionRequired -> {
+                        PermissionRequiredContent(
+                            onRequestPermission = { permissionHandler.requestPermission() }
+                        )
                     }
                 }
-            )
-        },
-        snackbarHost = {
-            SnackbarHost(hostState = snackbarHostState)
-        }
-    ) { paddingValues ->
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
-                .pullRefresh(pullRefreshState)
-        ) {
-            when (val state = uiState) {
-                is WeatherUiState.Loading -> {
-                    // LoadingIndicator removed - PullRefreshIndicator handles loading state
-                }
 
-                is WeatherUiState.Success -> {
-                    WeatherContent(
-                        currentWeather = state.currentWeather,
-                        forecast = state.forecast,
-                        cityName = state.cityName,
-                        lastUpdated = state.lastUpdated,
-                        userSettings = userSettings
-                    )
-                }
-
-                is WeatherUiState.Error -> {
-                    ErrorMessage(
-                        message = state.message,
-                        onRetry = { viewModel.refresh() }
-                    )
-                }
-
-                is WeatherUiState.PermissionRequired -> {
-                    PermissionRequiredContent(
-                        onRequestPermission = { permissionHandler.requestPermission() }
-                    )
-                }
+                PullRefreshIndicator(
+                    refreshing = isRefreshing,
+                    state = pullRefreshState,
+                    modifier = Modifier.align(Alignment.TopCenter)
+                )
             }
-
-            PullRefreshIndicator(
-                refreshing = isRefreshing,
-                state = pullRefreshState,
-                modifier = Modifier.align(Alignment.TopCenter)
-            )
         }
     }
 }
