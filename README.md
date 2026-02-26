@@ -87,9 +87,9 @@ adb install -r app/build/outputs/apk/debug/app-debug.apk
 
 ## 📊 Project Status
 
-**Current Phase:** 🎉 **MVP COMPLETE**
+**Current Phase:** 🎉 **PRODUCTION-READY**
 
-**Progress:** 123/127 pts (97%) | **5 Sprints** | **38 PRs merged**
+**Progress:** 143 pts total (6 sprints) | **MVP: 123/127 pts (97%)** | **48 PRs merged**
 
 ### Sprint Progress
 - **Sprint 1 — Foundation** (29/29 pts) ✅ **COMPLETE**
@@ -122,21 +122,30 @@ adb install -r app/build/outputs/apk/debug/app-debug.apk
   - ✅ S6.3: Accessibility & A11y (semantic descriptions + comprehensive audit)
   - ✅ S6.4: Final Device QA (10/11 ACs, zero crashes, production-ready)
 
+- **Sprint 6 — Polish & UX** (20/20 pts) ✅ **COMPLETE** *(post-MVP)*
+  - ✅ S7.1: Persistent Bottom Navigation (all screens)
+  - ✅ S7.2: Move Favorite Star to TopAppBar (better UX)
+  - ✅ S7.3: Fix Favorites Country Names (display full location)
+  - ✅ S7.4: Dark Mode Toggle in Settings (system-based)
+  - ✅ S7.5: Splash Screen & Launcher Icon (adaptive + round variants)
+  - ✅ S7.6: Clean Screenshots (no sudo toasts)
+
 ### Milestones
 - ✅ [Sprint 1 — Foundation](https://github.com/giruai/clima-test/milestone/1) (29 pts) — CLOSED
 - ✅ [Sprint 2 — Weather Display](https://github.com/giruai/clima-test/milestone/2) (26 pts) — CLOSED
 - ✅ [Sprint 3 — Favorites](https://github.com/giruai/clima-test/milestone/3) (23 pts) — CLOSED
 - ✅ [Sprint 4 — Settings & Polish](https://github.com/giruai/clima-test/milestone/4) (27 pts) — CLOSED
 - ✅ [Sprint 5 — Launch](https://github.com/giruai/clima-test/milestone/5) (18 pts) — CLOSED
+- ✅ [Sprint 6 — Polish & UX](https://github.com/giruai/clima-test/milestone/6) (20 pts) — CLOSED
 
-**🎉 ALL MILESTONES COMPLETE**
+**🎉 ALL 6 MILESTONES COMPLETE**
 
 [View all issues →](https://github.com/giruai/clima-test/issues)
 
 ### Recent Activity
+- **2026-02-26**: 🎉 **Sprint 6 COMPLETE** — Launcher icons (commit 6cb56c2), bottom nav refactor, dark mode toggle, splash screen (PRs #45, #46)
 - **2026-02-25**: 🎉 **MVP COMPLETE** — Sprint 5 done (accessibility + final QA), 123/127 pts (97%), zero crashes, production-ready
 - **2026-02-25**: Sprint 4 complete — Settings, unit conversions, Material 3 theme, loading/error states, reverse geocoding (6 PRs: #31-#36)
-- **2026-02-25**: Sprint 3 complete — Favorites flow (database, UI, add/delete) with end-to-end device testing (PR #30)
 
 ## 🧪 Testing
 
@@ -158,14 +167,23 @@ adb install -r app/build/outputs/apk/debug/app-debug.apk
 
 ## 🎯 What's Next
 
-**MVP Status:** ✅ Production-ready (10/11 QA criteria passed)
+**Project Status:** ✅ Production-ready + polished (6 sprints, 143 pts)
 
 **Options:**
-1. **Release as-is** — APK ready, 9.4MB, zero crashes, all features working
-2. **Add v2 features** — Offline cache, app icon, splash screen, Play Store listing
-3. **Archive project** — MVP achieved, document learnings
+1. **Release to Play Store** — APK ready, launcher icon configured, zero crashes
+2. **Add v2 features** — Widgets, offline cache, hourly forecasts, air quality
+3. **Archive project** — Full feature set achieved, documented
 
-**Known limitation:** No offline cache (Room stores favorites only, not weather data). Non-blocking for v1, deferred to v2.
+**Features Complete:**
+- ✅ Weather + forecasts (5-day)
+- ✅ City search + favorites (max 10)
+- ✅ Unit conversions (°C/°F, km/h/mph)
+- ✅ Dark mode (system-based)
+- ✅ Accessibility (semantic descriptions)
+- ✅ Launcher icon (adaptive + round)
+- ✅ Splash screen configured
+
+**Known limitation:** No offline cache (Room stores favorites only, not weather data). Non-blocking for release, deferred to v2.
 
 ## 👤 Author
 
@@ -174,5 +192,5 @@ Product Owner: Franco (@noscr33n)
 
 ---
 
-**Last updated:** 2026-02-25  
-**Status:** 🎉 MVP COMPLETE
+**Last updated:** 2026-02-26  
+**Status:** 🎉 PRODUCTION-READY (6 sprints, 143 pts)
