@@ -95,8 +95,8 @@ data class WeatherColors(
  */
 fun getWeatherColors(condition: WeatherCondition, isNight: Boolean = false): WeatherColors {
     val scheme = when (condition) {
-        WeatherCondition.CLEAR_SKY,
-        WeatherCondition.PARTLY_CLOUDY -> if (isNight) ClearNightColors else SunnyColors
+        WeatherCondition.CLEAR_SKY -> if (isNight) ClearNightColors else SunnyColors
+        WeatherCondition.PARTLY_CLOUDY -> PartlyCloudyColors
         WeatherCondition.OVERCAST -> CloudyColors
         WeatherCondition.FOG -> FoggyColors
         WeatherCondition.DRIZZLE,

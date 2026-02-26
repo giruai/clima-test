@@ -135,15 +135,26 @@ val ClearNightColors = WeatherColorScheme(
     textTint = Color(0xFFA8D4FF)       // Cool white
 )
 
-// Cloudy - Muted silver-blues
+// Partly Cloudy - Steel-blue/silver gradient, brighter than default
+val PartlyCloudyColors = WeatherColorScheme(
+    primary = Color(0xFF7BA4C0),         // Soft steel blue
+    secondary = Color(0xFFFFB74D),       // Soft amber (sun hint)
+    gradientStart = Color(0xFF4A6A80),   // Steel blue (visibly lighter)
+    gradientMid = Color(0xFF7A9AB0),     // Silver-blue (bright mid)
+    gradientEnd = Color(0xFF354D60),     // Blue-gray base
+    iconGlow = Color(0x40FFB74D),        // 25% amber
+    textTint = Color(0xFFE3F2FD)         // Very light blue
+)
+
+// Cloudy - Muted silver-blues with lighter mid-tones
 val CloudyColors = WeatherColorScheme(
     primary = Color(0xFF90A4AE),
     secondary = Color(0xFFB0BEC5),
-    gradientStart = Color(0xFF2C3E50),
-    gradientMid = Color(0xFF3D5A6E),
-    gradientEnd = Color(0xFF2C3E50),
-    iconGlow = Color(0x2090A4AE),      // 13% silver
-    textTint = Color(0xFFCFD8DC)       // Light gray
+    gradientStart = Color(0xFF253545),     // Lighter dark blue-gray
+    gradientMid = Color(0xFF4A6070),       // Silver-blue mid tone
+    gradientEnd = Color(0xFF2C3E50),       // Dark blue-gray
+    iconGlow = Color(0x3090A4AE),          // 19% silver
+    textTint = Color(0xFFECEFF1)           // Very light gray/silver
 )
 
 // Rainy - Deep cool blues
