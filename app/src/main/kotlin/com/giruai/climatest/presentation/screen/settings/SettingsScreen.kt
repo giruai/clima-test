@@ -16,6 +16,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.giruai.climatest.data.local.preferences.TemperatureUnit
+import com.giruai.climatest.data.local.preferences.ThemeMode
 import com.giruai.climatest.data.local.preferences.WindUnit
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -62,6 +63,34 @@ fun SettingsScreen(
                     options = WindUnit.entries,
                     onValueChange = viewModel::setWindUnit,
                     getLabel = { it.symbol }
+                )
+            }
+
+            Divider()
+
+            // Theme Section
+            Text(
+                text = "Appearance",
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.primary
+            )
+
+            // Theme Mode
+            SettingRow(
+                title = "Theme",
+                subtitle = "Choose light or dark mode"
+            ) {
+                SegmentedButton(
+                    selectedValue = uiState.settings.themeMode,
+                    options = ThemeMode.entries,
+                    onValueChange = viewModel::setThemeMode,
+                    getLabel = { mode ->
+                        when (mode) {
+                            ThemeMode.SYSTEM -> "System"
+                            ThemeMode.LIGHT -> "Light"
+                            ThemeMode.DARK -> "Dark"
+                        }
+                    }
                 )
             }
 

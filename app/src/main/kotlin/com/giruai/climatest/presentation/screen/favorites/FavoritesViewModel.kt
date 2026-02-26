@@ -7,12 +7,14 @@ import com.giruai.climatest.domain.model.City
 import com.giruai.climatest.domain.usecase.GetFavoritesUseCase
 import com.giruai.climatest.domain.usecase.RemoveFavoriteUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -39,28 +41,48 @@ class FavoritesViewModel @Inject constructor(
                 if (favorites.isEmpty()) {
                     _uiState.value = FavoritesUiState.Empty
                 } else {
-                    // Resolve city names for favorites with unknown/coordinate names
-                    val resolved = favorites.map { city ->
+                    // Show favorites immediately, then resolve names in background
+                    _uiState.value = FavoritesUiState.Success(favorites)
+                    
+                    // Check if any favorites need name resolution
+                    val needsResolution = favorites.any { 
+                        it.name.contains("°") || it.country == "Unknown" 
+                    }
+                    if (needsResolution) {
+                        resolveNames(favorites)
+                    }
+                }
+            }
+            .launchIn(viewModelScope)
+    }
+    
+    private fun resolveNames(favorites: List<City>) {
+        viewModelScope.launch {
+            try {
+                val resolved = withContext(Dispatchers.IO) {
+                    favorites.map { city ->
                         if (city.name.contains("°") || city.country == "Unknown") {
-                            val cityName = reverseGeocoder.getCityName(city.latitude, city.longitude)
-                            val parts = cityName.split(", ")
-                            val name = parts.firstOrNull() ?: city.name
-                            val country = if (parts.size > 1) parts.last() else city.country
-                            City(
-                                id = city.id,
-                                name = name,
-                                country = country,
-                                latitude = city.latitude,
-                                longitude = city.longitude
-                            )
+                            try {
+                                val cityName = reverseGeocoder.getCityName(city.latitude, city.longitude)
+                                val parts = cityName.split(", ")
+                                val name = parts.firstOrNull() ?: city.name
+                                val country = if (parts.size > 1) parts.last() else city.country
+                                City(id = city.id, name = name, country = country,
+                                     latitude = city.latitude, longitude = city.longitude)
+                            } catch (e: Exception) {
+                                Timber.w(e, "Failed to resolve name for ${city.latitude}, ${city.longitude}")
+                                city
+                            }
                         } else {
                             city
                         }
                     }
-                    _uiState.value = FavoritesUiState.Success(resolved)
                 }
+                _uiState.value = FavoritesUiState.Success(resolved)
+            } catch (e: Exception) {
+                Timber.e(e, "Failed to resolve favorite names")
             }
-            .launchIn(viewModelScope)
+        }
     }
 
     fun onDeleteClick(cityId: Long, cityName: String) {
