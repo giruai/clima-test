@@ -5,9 +5,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material.icons.filled.Search
-import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.outlined.Star
 import androidx.compose.material.pullrefresh.PullRefreshIndicator
@@ -31,14 +28,11 @@ import com.giruai.climatest.presentation.util.rememberLocationPermissionHandler
 import java.text.SimpleDateFormat
 import java.util.*
 
-@OptIn(ExperimentalMaterialApi::class)
+@OptIn(ExperimentalMaterialApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun WeatherScreen(
     initialLatitude: Double? = null,
     initialLongitude: Double? = null,
-    onNavigateToSearch: () -> Unit,
-    onNavigateToFavorites: () -> Unit,
-    onNavigateToSettings: () -> Unit,
     viewModel: WeatherViewModel = hiltViewModel()
 ) {
     // Pass initial coords to ViewModel if provided
@@ -83,44 +77,31 @@ fun WeatherScreen(
         onRefresh = { viewModel.refresh() }
     )
 
+    // Get city name for TopAppBar
+    val topBarTitle = when (val state = uiState) {
+        is WeatherUiState.Success -> state.cityName
+        else -> "Weather"
+    }
+
     Scaffold(
-        bottomBar = {
-            NavigationBar {
-                NavigationBarItem(
-                    icon = { Icon(Icons.Filled.Search, contentDescription = "Search") },
-                    label = { Text("Search") },
-                    selected = false,
-                    onClick = onNavigateToSearch
-                )
-                NavigationBarItem(
-                    icon = { Icon(Icons.Filled.Favorite, contentDescription = "Favorites") },
-                    label = { Text("Favorites") },
-                    selected = false,
-                    onClick = onNavigateToFavorites
-                )
-                NavigationBarItem(
-                    icon = { Icon(Icons.Filled.Settings, contentDescription = "Settings") },
-                    label = { Text("Settings") },
-                    selected = false,
-                    onClick = onNavigateToSettings
-                )
-            }
-        },
-        floatingActionButton = {
-            if (uiState is WeatherUiState.Success) {
-                FloatingActionButton(
-                    onClick = { viewModel.addToFavorites() },
-                    containerColor = if (isFavorite)
-                        MaterialTheme.colorScheme.primaryContainer
-                    else
-                        MaterialTheme.colorScheme.primary
-                ) {
-                    Icon(
-                        imageVector = if (isFavorite) Icons.Filled.Star else Icons.Outlined.Star,
-                        contentDescription = if (isFavorite) "Already in favorites" else "Add to favorites"
-                    )
+        topBar = {
+            TopAppBar(
+                title = { Text(topBarTitle) },
+                actions = {
+                    if (uiState is WeatherUiState.Success) {
+                        IconButton(onClick = { viewModel.addToFavorites() }) {
+                            Icon(
+                                imageVector = if (isFavorite) Icons.Filled.Star else Icons.Outlined.Star,
+                                contentDescription = if (isFavorite) "Remove from favorites" else "Add to favorites",
+                                tint = if (isFavorite)
+                                    MaterialTheme.colorScheme.primary
+                                else
+                                    MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                    }
                 }
-            }
+            )
         },
         snackbarHost = {
             SnackbarHost(hostState = snackbarHostState)
@@ -156,8 +137,7 @@ fun WeatherScreen(
 
                 is WeatherUiState.PermissionRequired -> {
                     PermissionRequiredContent(
-                        onRequestPermission = { permissionHandler.requestPermission() },
-                        onNavigateToSearch = onNavigateToSearch
+                        onRequestPermission = { permissionHandler.requestPermission() }
                     )
                 }
             }
@@ -350,8 +330,7 @@ private fun ForecastItem(day: DailyForecast, userSettings: UserSettings) {
 
 @Composable
 private fun PermissionRequiredContent(
-    onRequestPermission: () -> Unit,
-    onNavigateToSearch: () -> Unit
+    onRequestPermission: () -> Unit
 ) {
     Box(
         modifier = Modifier.fillMaxSize(),
@@ -372,16 +351,13 @@ private fun PermissionRequiredContent(
                 textAlign = TextAlign.Center
             )
             Text(
-                text = "ClimaApp needs your location to show weather for your area.",
+                text = "ClimaApp needs your location to show weather for your area. Or use the Search tab to find a city.",
                 style = MaterialTheme.typography.bodyLarge,
                 textAlign = TextAlign.Center,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
             Button(onClick = onRequestPermission) {
                 Text("Enable Location")
-            }
-            TextButton(onClick = onNavigateToSearch) {
-                Text("Search for a city instead")
             }
         }
     }

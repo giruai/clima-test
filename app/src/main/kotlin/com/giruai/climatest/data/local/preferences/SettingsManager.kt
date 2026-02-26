@@ -19,9 +19,16 @@ enum class WindUnit(val symbol: String) {
     MPH("mph")
 }
 
+enum class ThemeMode {
+    SYSTEM,
+    LIGHT,
+    DARK
+}
+
 data class UserSettings(
     val temperatureUnit: TemperatureUnit = TemperatureUnit.CELSIUS,
-    val windUnit: WindUnit = WindUnit.KMH
+    val windUnit: WindUnit = WindUnit.KMH,
+    val themeMode: ThemeMode = ThemeMode.SYSTEM
 )
 
 @Singleton
@@ -44,16 +51,28 @@ class SettingsManager @Inject constructor(
         _settings.value = _settings.value.copy(windUnit = unit)
     }
 
+    fun setThemeMode(mode: ThemeMode) {
+        prefs.edit().putString(KEY_THEME_MODE, mode.name).apply()
+        _settings.value = _settings.value.copy(themeMode = mode)
+    }
+
     private fun loadSettings(): UserSettings {
         val tempUnit = prefs.getString(KEY_TEMP_UNIT, TemperatureUnit.CELSIUS.name)
             ?.let { TemperatureUnit.valueOf(it) } ?: TemperatureUnit.CELSIUS
         val windUnit = prefs.getString(KEY_WIND_UNIT, WindUnit.KMH.name)
             ?.let { WindUnit.valueOf(it) } ?: WindUnit.KMH
-        return UserSettings(temperatureUnit = tempUnit, windUnit = windUnit)
+        val themeMode = prefs.getString(KEY_THEME_MODE, ThemeMode.SYSTEM.name)
+            ?.let { ThemeMode.valueOf(it) } ?: ThemeMode.SYSTEM
+        return UserSettings(
+            temperatureUnit = tempUnit,
+            windUnit = windUnit,
+            themeMode = themeMode
+        )
     }
 
     companion object {
         private const val KEY_TEMP_UNIT = "temperature_unit"
         private const val KEY_WIND_UNIT = "wind_unit"
+        private const val KEY_THEME_MODE = "theme_mode"
     }
 }

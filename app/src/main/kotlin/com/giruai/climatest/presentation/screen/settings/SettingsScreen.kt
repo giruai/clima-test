@@ -16,37 +16,21 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.giruai.climatest.data.local.preferences.TemperatureUnit
+import com.giruai.climatest.data.local.preferences.ThemeMode
 import com.giruai.climatest.data.local.preferences.WindUnit
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsScreen(
-    onBack: () -> Unit,
     viewModel: SettingsViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val context = LocalContext.current
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text("Settings") },
-                navigationIcon = {
-                    IconButton(onClick = onBack) {
-                        Icon(
-                            imageVector = Icons.Filled.ArrowBack,
-                            contentDescription = "Back"
-                        )
-                    }
-                }
-            )
-        }
-    ) { paddingValues ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
-                .padding(16.dp),
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(24.dp)
         ) {
             // Units Section
@@ -84,6 +68,34 @@ fun SettingsScreen(
 
             Divider()
 
+            // Theme Section
+            Text(
+                text = "Appearance",
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.primary
+            )
+
+            // Theme Mode
+            SettingRow(
+                title = "Theme",
+                subtitle = "Choose light or dark mode"
+            ) {
+                SegmentedButton(
+                    selectedValue = uiState.settings.themeMode,
+                    options = ThemeMode.entries,
+                    onValueChange = viewModel::setThemeMode,
+                    getLabel = { mode ->
+                        when (mode) {
+                            ThemeMode.SYSTEM -> "System"
+                            ThemeMode.LIGHT -> "Light"
+                            ThemeMode.DARK -> "Dark"
+                        }
+                    }
+                )
+            }
+
+            Divider()
+
             // Permissions Section
             Text(
                 text = "Permissions",
@@ -108,7 +120,6 @@ fun SettingsScreen(
                 }
             }
         }
-    }
 }
 
 @Composable

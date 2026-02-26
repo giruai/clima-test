@@ -22,33 +22,16 @@ import com.giruai.climatest.presentation.components.LoadingIndicator
 @Composable
 fun SearchScreen(
     onCitySelected: (Long, Double, Double) -> Unit,
-    onBack: () -> Unit,
     viewModel: SearchViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val query by viewModel.query.collectAsState()
     val recentSearches by viewModel.recentSearches.collectAsState()
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = {},
-                navigationIcon = {
-                    IconButton(onClick = onBack) {
-                        Icon(
-                            imageVector = Icons.Default.ArrowBack,
-                            contentDescription = "Back"
-                        )
-                    }
-                }
-            )
-        }
-    ) { paddingValues ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
-        ) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+    ) {
             // Search Bar
             SearchBar(
                 query = query,
@@ -98,7 +81,6 @@ fun SearchScreen(
                 }
             }
         }
-    }
 }
 
 @Composable

@@ -8,6 +8,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.giruai.climatest.data.local.preferences.SettingsManager
 import com.giruai.climatest.data.local.preferences.TemperatureUnit
+import com.giruai.climatest.data.local.preferences.ThemeMode
 import com.giruai.climatest.data.local.preferences.UserSettings
 import com.giruai.climatest.data.local.preferences.WindUnit
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -55,6 +56,12 @@ class SettingsViewModel @Inject constructor(
     fun setWindUnit(unit: WindUnit) {
         viewModelScope.launch {
             settingsManager.setWindUnit(unit)
+        }
+    }
+
+    fun setThemeMode(mode: ThemeMode) {
+        viewModelScope.launch {
+            settingsManager.setThemeMode(mode)
         }
     }
 
