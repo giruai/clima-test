@@ -81,6 +81,7 @@ dependencies {
     implementation("androidx.compose.material3:material3:1.1.2")
     implementation("androidx.compose.material:material:1.5.4") // For pull-to-refresh
     implementation("androidx.navigation:navigation-compose:2.7.5")
+    implementation("androidx.core:core-splashscreen:1.0.1")
 
     // Hilt
     implementation("com.google.dagger:hilt-android:2.48")
