@@ -14,14 +14,17 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.giruai.climatest.data.local.preferences.UserSettings
 import com.giruai.climatest.domain.model.CurrentWeather
 import com.giruai.climatest.domain.model.DailyForecast
 import com.giruai.climatest.domain.model.WeatherCondition
 import com.giruai.climatest.presentation.components.ErrorMessage
+import com.giruai.climatest.presentation.components.ForecastRow
 import com.giruai.climatest.presentation.components.GlassPill
 import com.giruai.climatest.presentation.components.LoadingIndicator
 import com.giruai.climatest.presentation.components.TemperatureDisplay
@@ -203,18 +206,12 @@ private fun WeatherContent(
             )
         }
 
-        // 5-Day Forecast Header
+        // Horizontal Forecast Row (S7.4)
         item {
-            Text(
-                text = "5-Day Forecast",
-                style = MaterialTheme.typography.titleLarge,
-                color = MaterialTheme.colorScheme.primary
+            ForecastRow(
+                forecast = forecast,
+                tempUnit = userSettings.temperatureUnit
             )
-        }
-
-        // Forecast Items
-        items(forecast) { day ->
-            ForecastItem(day, userSettings)
         }
     }
 }
