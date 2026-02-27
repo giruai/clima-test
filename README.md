@@ -130,13 +130,14 @@ adb install -r app/build/outputs/apk/debug/app-debug.apk
   - ✅ S7.5: Splash Screen & Launcher Icon (adaptive + round variants)
   - ✅ S7.6: Clean Screenshots (no sudo toasts)
 
-- **Sprint 7 — Visual Polish** (22/35 pts) 🚧 **IN PROGRESS** *(premium UI)*
+- **Sprint 7 — Visual Polish** (26/35 pts) 🚧 **IN PROGRESS** *(premium UI)*
   - ✅ S7.1: Custom Color System & Theme Engine (PR #57)
   - ✅ S7.2: Dynamic Weather Backgrounds with animated gradients (PR #58)
   - ✅ S7.3: Premium Weather Hero Card — gradient text, glowing icon, glass pills (PR #59)
   - ✅ S7.4: 5-Day Forecast Redesign — horizontal scroll + color coding (PR #61)
   - ✅ S7.5: Glassmorphism Bottom Navigation — floating glass panel (PR #62)
-  - 🚧 S7.6: Rich Favorites Screen (next)
+  - ✅ S7.6: Rich Favorites Screen — weather preview + glass cards (PR #63)
+  - 🚧 S7.7: Search Screen Polish (next)
 
 ### Milestones
 - ✅ [Sprint 1 — Foundation](https://github.com/giruai/clima-test/milestone/1) (29 pts) — CLOSED
@@ -145,7 +146,7 @@ adb install -r app/build/outputs/apk/debug/app-debug.apk
 - ✅ [Sprint 4 — Settings & Polish](https://github.com/giruai/clima-test/milestone/4) (27 pts) — CLOSED
 - ✅ [Sprint 5 — Launch](https://github.com/giruai/clima-test/milestone/5) (18 pts) — CLOSED
 - ✅ [Sprint 6 — Polish & UX](https://github.com/giruai/clima-test/milestone/6) (20 pts) — CLOSED
-- 🚧 [Sprint 7 — Visual Polish](https://github.com/giruai/clima-test/milestone/7) (22/35 pts) — OPEN
+- 🚧 [Sprint 7 — Visual Polish](https://github.com/giruai/clima-test/milestone/7) (26/35 pts) — OPEN
 
 **🎉 6/7 MILESTONES COMPLETE — Sprint 7 in progress**
 
