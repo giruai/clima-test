@@ -1,25 +1,34 @@
 package com.giruai.climatest.presentation.screen.favorites
 
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.pullrefresh.PullRefreshIndicator
 import androidx.compose.material.pullrefresh.pullRefresh
 import androidx.compose.material.pullrefresh.rememberPullRefreshState
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.giruai.climatest.domain.model.City
+import com.giruai.climatest.domain.model.WeatherCondition
 import com.giruai.climatest.presentation.components.LoadingIndicator
+import com.giruai.climatest.presentation.components.RichFavoriteCard
+import com.giruai.climatest.presentation.components.WeatherBackground
 
 @OptIn(ExperimentalMaterialApi::class, ExperimentalMaterial3Api::class)
 @Composable
@@ -29,18 +38,22 @@ fun FavoritesScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val showDeleteDialog by viewModel.showDeleteDialog.collectAsState()
+    val userSettings by viewModel.userSettings.collectAsState()
 
-    val isRefreshing = false // Auto-refresh via Flow, no manual refresh needed
+    val isRefreshing = uiState is FavoritesUiState.Loading
     val pullRefreshState = rememberPullRefreshState(
         refreshing = isRefreshing,
         onRefresh = { viewModel.refresh() }
     )
 
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .pullRefresh(pullRefreshState)
+    WeatherBackground(
+        weatherCondition = WeatherCondition.PARTLY_CLOUDY // Neutral background for favorites
     ) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .pullRefresh(pullRefreshState)
+        ) {
             when (val state = uiState) {
                 is FavoritesUiState.Loading -> {
                     LoadingIndicator()
@@ -49,11 +62,16 @@ fun FavoritesScreen(
                 is FavoritesUiState.Success -> {
                     FavoritesList(
                         favorites = state.favorites,
-                        onCityClick = { city ->
-                            onCitySelected(city.id, city.latitude, city.longitude)
+                        tempUnit = userSettings.temperatureUnit,
+                        onCityClick = { favorite ->
+                            onCitySelected(
+                                favorite.city.id,
+                                favorite.city.latitude,
+                                favorite.city.longitude
+                            )
                         },
-                        onDeleteClick = { city ->
-                            viewModel.onDeleteClick(city.id, city.name)
+                        onDeleteClick = { favorite ->
+                            viewModel.onDeleteClick(favorite.city.id, favorite.city.name)
                         }
                     )
                 }
@@ -69,6 +87,7 @@ fun FavoritesScreen(
                 modifier = Modifier.align(Alignment.TopCenter)
             )
         }
+    }
 
     // Delete confirmation dialog
     showDeleteDialog?.let { (cityId, cityName) ->
@@ -92,9 +111,10 @@ fun FavoritesScreen(
 
 @Composable
 private fun FavoritesList(
-    favorites: List<City>,
-    onCityClick: (City) -> Unit,
-    onDeleteClick: (City) -> Unit
+    favorites: List<RichFavorite>,
+    tempUnit: com.giruai.climatest.data.local.preferences.TemperatureUnit,
+    onCityClick: (RichFavorite) -> Unit,
+    onDeleteClick: (RichFavorite) -> Unit
 ) {
     LazyColumn(
         contentPadding = PaddingValues(16.dp),
@@ -102,57 +122,17 @@ private fun FavoritesList(
     ) {
         items(
             items = favorites,
-            key = { it.id }
-        ) { city ->
-            FavoriteCityItem(
-                city = city,
-                onClick = { onCityClick(city) },
-                onDeleteClick = { onDeleteClick(city) }
+            key = { it.city.id }
+        ) { favorite ->
+            RichFavoriteCard(
+                cityName = favorite.city.name,
+                country = favorite.city.country,
+                temperature = favorite.temperature,
+                condition = favorite.condition,
+                tempUnit = tempUnit,
+                onClick = { onCityClick(favorite) },
+                onDeleteClick = { onDeleteClick(favorite) }
             )
-        }
-    }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-private fun FavoriteCityItem(
-    city: City,
-    onClick: () -> Unit,
-    onDeleteClick: () -> Unit
-) {
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable(onClick = onClick),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Column(modifier = Modifier.weight(1f)) {
-                Text(
-                    text = "${city.name}, ${city.country}",
-                    style = MaterialTheme.typography.titleMedium
-                )
-                Spacer(modifier = Modifier.height(4.dp))
-                Text(
-                    text = "${String.format("%.2f", city.latitude)}°, ${String.format("%.2f", city.longitude)}°",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            }
-
-            IconButton(onClick = onDeleteClick) {
-                Icon(
-                    imageVector = Icons.Default.Delete,
-                    contentDescription = "Delete",
-                    tint = MaterialTheme.colorScheme.error
-                )
-            }
         }
     }
 }
@@ -175,7 +155,8 @@ private fun EmptyState() {
             Text(
                 text = "No favorites yet",
                 style = MaterialTheme.typography.titleLarge,
-                textAlign = TextAlign.Center
+                textAlign = TextAlign.Center,
+                color = MaterialTheme.colorScheme.onSurface
             )
             Text(
                 text = "Search for a city to add to your favorites",
