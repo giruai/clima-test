@@ -130,10 +130,12 @@ adb install -r app/build/outputs/apk/debug/app-debug.apk
   - ✅ S7.5: Splash Screen & Launcher Icon (adaptive + round variants)
   - ✅ S7.6: Clean Screenshots (no sudo toasts)
 
-- **Sprint 7 — Visual Polish** (10/35 pts) 🚧 **IN PROGRESS** *(premium UI)*
+- **Sprint 7 — Visual Polish** (19/35 pts) 🚧 **IN PROGRESS** *(premium UI)*
   - ✅ S7.1: Custom Color System & Theme Engine (PR #57)
   - ✅ S7.2: Dynamic Weather Backgrounds with animated gradients (PR #58)
-  - 🚧 S7.3: Premium Weather Hero Card (in progress)
+  - ✅ S7.3: Premium Weather Hero Card — gradient text, glowing icon, glass pills (PR #59)
+  - ✅ S7.4: 5-Day Forecast Redesign — horizontal scroll + color coding (PR #61)
+  - 🚧 S7.5: Glassmorphism Bottom Navigation (next)
 
 ### Milestones
 - ✅ [Sprint 1 — Foundation](https://github.com/giruai/clima-test/milestone/1) (29 pts) — CLOSED
@@ -142,14 +144,14 @@ adb install -r app/build/outputs/apk/debug/app-debug.apk
 - ✅ [Sprint 4 — Settings & Polish](https://github.com/giruai/clima-test/milestone/4) (27 pts) — CLOSED
 - ✅ [Sprint 5 — Launch](https://github.com/giruai/clima-test/milestone/5) (18 pts) — CLOSED
 - ✅ [Sprint 6 — Polish & UX](https://github.com/giruai/clima-test/milestone/6) (20 pts) — CLOSED
-- 🚧 [Sprint 7 — Visual Polish](https://github.com/giruai/clima-test/milestone/7) (10/35 pts) — OPEN
+- 🚧 [Sprint 7 — Visual Polish](https://github.com/giruai/clima-test/milestone/7) (19/35 pts) — OPEN
 
 **🎉 6/7 MILESTONES COMPLETE — Sprint 7 in progress**
 
 [View all issues →](https://github.com/giruai/clima-test/issues)
 
 ### Recent Activity
-- **2026-02-26**: 🎨 **Sprint 7 started** — S7.1 Color System (PR #57), S7.2 Dynamic Backgrounds (PR #58) — 10/35 pts
+- **2026-02-26**: 🎨 **Sprint 7 progress** — S7.1-S7.4 complete (19/35 pts): Color System, Dynamic Backgrounds, Hero Card, Forecast Redesign (PRs #57-61)
 - **2026-02-26**: 🎉 **Sprint 6 COMPLETE** — Launcher icons (commit 6cb56c2), bottom nav refactor, dark mode toggle, splash screen (PRs #45, #46)
 - **2026-02-25**: 🎉 **MVP COMPLETE** — Sprint 5 done (accessibility + final QA), 123/127 pts (97%), zero crashes, production-ready
 - **2026-02-25**: Sprint 4 complete — Settings, unit conversions, Material 3 theme, loading/error states, reverse geocoding (6 PRs: #31-#36)
