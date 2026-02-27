@@ -17,12 +17,12 @@ Android weather app with city search, 5-day forecast, favorites, and geolocation
 
 <table>
   <tr>
-    <td><img src="screenshots/01-weather.png" width="200"/><br/><b>Weather — Buenos Aires</b><br/>Reverse geocoding + unit conversions</td>
-    <td><img src="screenshots/02-settings.png" width="200"/><br/><b>Settings</b><br/>Unit preferences + permissions</td>
-    <td><img src="screenshots/03-favorites.png" width="200"/><br/><b>Favorites (Empty)</b><br/>Empty state with guidance</td>
+    <td><img src="screenshots/01-weather.png" width="200"/><br/><b>Weather — Premium UI</b><br/>Glass hero card + horizontal forecast + glassmorphism nav</td>
+    <td><img src="screenshots/02-search.png" width="200"/><br/><b>City Search</b><br/>Recent searches + glassmorphism bottom nav</td>
+    <td><img src="screenshots/03-favorites.png" width="200"/><br/><b>Favorites</b><br/>Glass cards with temp color coding</td>
   </tr>
   <tr>
-    <td><img src="screenshots/04-search.png" width="200"/><br/><b>City Search</b><br/>Recent searches + autocomplete</td>
+    <td><img src="screenshots/04-settings.png" width="200"/><br/><b>Settings</b><br/>Unit preferences + floating glass nav</td>
     <td></td>
     <td></td>
   </tr>
