@@ -6,11 +6,7 @@ import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material3.Icon
-import androidx.compose.material3.NavigationBar
-import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -23,6 +19,8 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.giruai.climatest.presentation.components.GlassBottomNav
+import com.giruai.climatest.presentation.components.GlassNavItem
 import com.giruai.climatest.presentation.screen.favorites.FavoritesScreen
 import com.giruai.climatest.presentation.screen.search.SearchScreen
 import com.giruai.climatest.presentation.screen.settings.SettingsScreen
@@ -58,40 +56,31 @@ sealed class BottomNavItem(
 fun ClimaNavGraph() {
     val navController = rememberNavController()
     
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
+    val currentRoute = navBackStackEntry?.destination?.route
+
+    val glassNavItems = listOf(
+        GlassNavItem(Routes.WEATHER, Icons.Filled.Home, "Weather"),
+        GlassNavItem(Routes.SEARCH, Icons.Filled.Search, "Search"),
+        GlassNavItem(Routes.FAVORITES, Icons.Filled.Favorite, "Favorites"),
+        GlassNavItem(Routes.SETTINGS, Icons.Filled.Settings, "Settings")
+    )
+
     Scaffold(
         bottomBar = {
-            NavigationBar {
-                val navBackStackEntry by navController.currentBackStackEntryAsState()
-                val currentDestination = navBackStackEntry?.destination
-                
-                val items = listOf(
-                    BottomNavItem.Weather,
-                    BottomNavItem.Search,
-                    BottomNavItem.Favorites,
-                    BottomNavItem.Settings
-                )
-                
-                items.forEach { item ->
-                    NavigationBarItem(
-                        selected = currentDestination?.hierarchy?.any { it.route?.startsWith(item.route) == true } == true,
-                        onClick = {
-                            navController.navigate(item.route) {
-                                // Pop up to start destination and save state
-                                popUpTo(Routes.WEATHER) {
-                                    saveState = true
-                                }
-                                // Avoid multiple copies
-                                launchSingleTop = true
-                                // Restore state when re-selecting
-                                restoreState = true
-                            }
-                        },
-                        icon = { Icon(item.icon, contentDescription = item.label) },
-                        label = { Text(item.label) }
-                    )
+            GlassBottomNav(
+                items = glassNavItems,
+                selectedRoute = currentRoute,
+                onItemSelected = { route ->
+                    navController.navigate(route) {
+                        popUpTo(Routes.WEATHER) { saveState = true }
+                        launchSingleTop = true
+                        restoreState = true
+                    }
                 }
-            }
-        }
+            )
+        },
+        containerColor = androidx.compose.ui.graphics.Color.Transparent
     ) { paddingValues ->
         ClimaNavHost(
             navController = navController,
